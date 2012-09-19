@@ -62,7 +62,7 @@ void initBoardColors() {
 			if ((col + lin) % 2 == 0) {
 				memcpy(boardColor[col][lin], WHITE, 4 * sizeof(GLfloat));
 			} else {
-				memcpy(boardColor[col][lin], GREY, 4 * sizeof(GLfloat));
+				memcpy(boardColor[col][lin], BEIGE, 4 * sizeof(GLfloat));
 			}
 		}
 	}
@@ -144,7 +144,7 @@ void drawPiece(piece p) {
 	if (p.pieceType == 'r' || p.pieceType == 'R') {
 		glColor4fv(RED);
 	} else {
-		glColor4fv(BEIGE);
+		glColor4fv(GREY);
 	}
 
 	glTranslatef(X0 + boardTileWidth * p.column, Y0 + boardTileHeight * p.line, 0);
