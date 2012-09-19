@@ -4,6 +4,7 @@
 #include <stack>
 #include "piece.cpp"
 
+// Defines and constants
 #define ROUND_PRECISION 50
 #define CIRC 2 * M_PI
 #define DTHETA CIRC / ROUND_PRECISION
@@ -15,11 +16,7 @@
 #define Y0 50.0f
 #define Y1 -50.0f
 
-GLfloat boardSquareWidth = (X1 - X0) / NCOLS_BOARD;
-GLfloat boardSquareHeight = (Y1 - Y0) / NLINS_BOARD;
-GLfloat pieceHeight = 2.5;
-GLfloat pieceWidth = boardSquareWidth / 2 - 1;
-
+// Colors
 const GLfloat WHITE[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat GREY[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
 const GLfloat LIGHT_GREEN[4] = { 0.0f, 0.4f, 0.0f, 1.0f };
@@ -27,24 +24,38 @@ const GLfloat RED[4] = { 0.35f, 0.0f, 0.0f, 1.0f };
 const GLfloat BLACK[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 const GLfloat BEIGE[4] = { 0.3f, 0.3f, 0.1f, 1.0f };
 
+// Camera and positioning
 GLfloat ratio = 1.0f;
 GLfloat eyePositionModifier = 1.0f;
 GLfloat eyePositionX = -100.0f;
 GLfloat eyePositionY = 0.0f;
 GLfloat eyePositionZ = 80.0f;
 
+// Lights
 GLfloat AMB[4] = { 0.3f, 0.3f, 0.3f, 1.0f };
 GLfloat DIF[4] = { 0.9f, 0.9f, 0.9f, 1.0f };
 GLfloat ESP[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 GLfloat POS[2][4] = { { 50.0f, 50.0f, 100.0f, 1.0f }, { -50.0f, -50.0f, 20.0f, 1.0f } };
 
+// Board and piece dimensions
+GLfloat boardTileWidth = (X1 - X0) / NCOLS_BOARD;
+GLfloat boardTileHeight = (Y1 - Y0) / NLINS_BOARD;
+GLfloat pieceHeight = 2.5;
+GLfloat pieceWidth = boardTileWidth / 2 - 1;
+
+// Board color state
 GLfloat boardColor[8][8][4];
 
+// Mouse click selection results
 int lastSelectedCoordinates[2];
 int lastHitCount = 0;
 
+// Piece stack from the core
 std::stack<piece> pieceStack;
 
+/**
+ * Resets the black/white color pattern for all the board tile
+ */
 void initBoardColors() {
 	for (int col = 0; col < 8; col++) {
 		for (int lin = 0; lin < 8; lin++) {
@@ -57,6 +68,10 @@ void initBoardColors() {
 	}
 }
 
+/**
+ * Initializes OpenGL light and depth configurations for the scene.
+ * Also initiates the board state.
+ */
 void init() {
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 
@@ -84,14 +99,20 @@ void init() {
 	initBoardColors();
 }
 
+/**
+ * Reads the current board color state and draws the alternated squares.
+ * Naming happens here in order to allow picking with GL_SELECT render mode.
+ *
+ * Param mode - The current OpenGl rendering mode.
+ */
 void drawBoard(GLenum mode) {
 	for (int col = 0; col < 8; col++) {
-		GLfloat x = X0 + boardSquareWidth * col;
+		GLfloat x = X0 + boardTileWidth * col;
 		if (mode == GL_SELECT) {
 			glLoadName(col);
 		}
 		for (int lin = 0; lin < 8; lin++) {
-			GLfloat y = Y0 + boardSquareHeight * lin;
+			GLfloat y = Y0 + boardTileHeight * lin;
 			if (mode == GL_SELECT) {
 				glPushName(lin);
 			}
@@ -100,9 +121,9 @@ void drawBoard(GLenum mode) {
 				glColor4fv(boardColor[col][lin]);
 				glNormal3f(0, 0, -1);
 				glVertex3f(x, y, 0.0f);
-				glVertex3f(x + boardSquareWidth, y, 0.0f);
-				glVertex3f(x + boardSquareWidth, y + boardSquareHeight, 0.0f);
-				glVertex3f(x, y + boardSquareHeight, 0.0f);
+				glVertex3f(x + boardTileWidth, y, 0.0f);
+				glVertex3f(x + boardTileWidth, y + boardTileHeight, 0.0f);
+				glVertex3f(x, y + boardTileHeight, 0.0f);
 			}
 			glEnd();
 			if (mode == GL_SELECT) {
@@ -112,6 +133,11 @@ void drawBoard(GLenum mode) {
 	}
 }
 
+/**
+ * Receives a piece and draws it within the appropriate position and color.
+ *
+ * Param piece - The piece to draw
+ */
 void drawPiece(piece p) {
 	glPushMatrix();
 
@@ -121,8 +147,8 @@ void drawPiece(piece p) {
 		glColor4fv(BEIGE);
 	}
 
-	glTranslatef(X0 + boardSquareWidth * p.column, Y0 + boardSquareHeight * p.line, 0);
-	glTranslatef(boardSquareWidth / 2, boardSquareHeight / 2, 0);
+	glTranslatef(X0 + boardTileWidth * p.column, Y0 + boardTileHeight * p.line, 0);
+	glTranslatef(boardTileWidth / 2, boardTileHeight / 2, 0);
 
 	gluDisk(gluNewQuadric(), 0, pieceWidth, ROUND_PRECISION, ROUND_PRECISION);
 	gluCylinder(gluNewQuadric(), pieceWidth, pieceWidth, pieceHeight, ROUND_PRECISION, ROUND_PRECISION);
@@ -131,6 +157,9 @@ void drawPiece(piece p) {
 	glPopMatrix();
 }
 
+/**
+ * Main drawing function. Renders the game state including the board and pieces.
+ */
 void display(void) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -142,9 +171,18 @@ void display(void) {
 
 	drawBoard(GL_RENDER);
 
+	//TODO: This is a Test
+	piece p(3, 3, 'r');
+	piece p2(1, 1, 'b');
+	drawPiece(p);
+	drawPiece(p2);
+
 	glFlush();
 }
 
+/**
+ * Handles window resizing
+ */
 void setWindowSize(unsigned int w, unsigned int h) {
 	if (h == 0)
 		h = 1;
@@ -157,11 +195,12 @@ void setWindowSize(unsigned int w, unsigned int h) {
 	gluPerspective(60, ratio, 0.5, 500.0);
 }
 
-/*  processHits prints out the contents of the selection array.  */
+/**
+ * Reads the selection buffer and saves the selection on the proper global variables.
+ * Method extracted from the example. Won't touch it too much because its ugly.
+ * I'm gonna try to treat it like a black box.
+ */
 void processHits(GLint hits, GLuint buffer[]) {
-
-	// Method extracted from the example. Won't touch it because its ugly.
-	// I'm gonna treat it like a black box.
 	GLuint names, *bufferIntegerPointer;
 
 	printf("hits = %d\n", hits);
@@ -186,6 +225,9 @@ void processHits(GLint hits, GLuint buffer[]) {
 	}
 }
 
+/**
+ * Translates the mouse click coordinates into an element selection using OpenGl GL_SELECT render mode.
+ */
 void pickSquares(int x, int y) {
 	GLint viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
@@ -216,10 +258,16 @@ void pickSquares(int x, int y) {
 	processHits(hits, selectBuf);
 }
 
+/**
+ * Lights up one of the board tile to the desired new color
+ */
 void lightSquare(int col, int lin, const GLfloat color[4]) {
 	memcpy(boardColor[col][lin], color, 4 * sizeof(GLfloat));
 }
 
+/**
+ * Brings the board tile to its default color.
+ */
 void restoreSquare(int col, int lin) {
 	if ((col + lin) % 2 == 0) {
 		memcpy(boardColor[col][lin], WHITE, 4 * sizeof(GLfloat));
@@ -267,12 +315,6 @@ public:
 			}
 
 			display();
-
-			//TODO: This is a Test
-			piece p(3, 3, 'r');
-			piece p2(1, 1, 'b');
-			drawPiece(p);
-			drawPiece(p2);
 
 			App->Display();
 		}
