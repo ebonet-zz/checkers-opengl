@@ -1,7 +1,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <SFML/Window.hpp>
+#include <stack>
+#include "piece.cpp"
 
+#define ROUND_PRECISION 50
+#define CIRC 2 * M_PI
+#define DTHETA CIRC / ROUND_PRECISION
 #define WINDOW_SIZE 900
 #define NCOLS_BOARD 8
 #define NLINS_BOARD 8
@@ -10,9 +15,17 @@
 #define Y0 50.0f
 #define Y1 -50.0f
 
+GLfloat boardSquareWidth = (X1 - X0) / NCOLS_BOARD;
+GLfloat boardSquareHeight = (Y1 - Y0) / NLINS_BOARD;
+GLfloat pieceHeight = 2.5;
+GLfloat pieceWidth = boardSquareWidth / 2 - 1;
+
 const GLfloat WHITE[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat GREY[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
 const GLfloat LIGHT_GREEN[4] = { 0.0f, 0.4f, 0.0f, 1.0f };
+const GLfloat RED[4] = { 0.4f, 0.0f, 0.0f, 1.0f };
+const GLfloat BLACK[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+const GLfloat BEIGE[4] = { 0.3f, 0.3f, 0.1f, 1.0f };
 
 GLfloat ratio = 1.0f;
 GLfloat eyePositionModifier = 1.0f;
@@ -29,6 +42,8 @@ GLfloat boardColor[8][8][4];
 
 int lastSelectedCoordinates[2];
 int lastHitCount = 0;
+
+std::stack<piece> pieceStack;
 
 void initBoardColors() {
 	for (int col = 0; col < 8; col++) {
@@ -70,16 +85,13 @@ void init() {
 }
 
 void drawBoard(GLenum mode) {
-	GLfloat pieceWidth = (X1 - X0) / NCOLS_BOARD;
-	GLfloat pieceHeight = (Y1 - Y0) / NLINS_BOARD;
-
 	for (int col = 0; col < 8; col++) {
-		GLfloat x = X0 + pieceWidth * col;
+		GLfloat x = X0 + boardSquareWidth * col;
 		if (mode == GL_SELECT) {
 			glLoadName(col);
 		}
 		for (int lin = 0; lin < 8; lin++) {
-			GLfloat y = Y0 + pieceHeight * lin;
+			GLfloat y = Y0 + boardSquareHeight * lin;
 			if (mode == GL_SELECT) {
 				glPushName(lin);
 			}
@@ -88,9 +100,9 @@ void drawBoard(GLenum mode) {
 				glColor4fv(boardColor[col][lin]);
 				glNormal3f(0, 0, -1);
 				glVertex3f(x, y, 0.0f);
-				glVertex3f(x + pieceWidth, y, 0.0f);
-				glVertex3f(x + pieceWidth, y + pieceHeight, 0.0f);
-				glVertex3f(x, y + pieceHeight, 0.0f);
+				glVertex3f(x + boardSquareWidth, y, 0.0f);
+				glVertex3f(x + boardSquareWidth, y + boardSquareHeight, 0.0f);
+				glVertex3f(x, y + boardSquareHeight, 0.0f);
 			}
 			glEnd();
 			if (mode == GL_SELECT) {
@@ -98,6 +110,25 @@ void drawBoard(GLenum mode) {
 			}
 		}
 	}
+}
+
+void drawPiece(piece p) {
+	glPushMatrix();
+
+	if (p.pieceType == 'r' || p.pieceType == 'R') {
+		glColor4fv(RED);
+	} else {
+		glColor4fv(BEIGE);
+	}
+
+	glTranslatef(X0 + boardSquareWidth * p.column, Y0 + boardSquareHeight * p.line, 0);
+	glTranslatef(boardSquareWidth / 2, boardSquareHeight / 2, 0);
+
+	gluDisk(gluNewQuadric(), 0, pieceWidth, ROUND_PRECISION, ROUND_PRECISION);
+	gluCylinder(gluNewQuadric(), pieceWidth, pieceWidth, pieceHeight, ROUND_PRECISION, ROUND_PRECISION);
+	glTranslatef(0, 0, pieceHeight);
+	gluDisk(gluNewQuadric(), 0, pieceWidth, ROUND_PRECISION, ROUND_PRECISION);
+	glPopMatrix();
 }
 
 void display(void) {
@@ -114,7 +145,7 @@ void display(void) {
 	glFlush();
 }
 
-void setSize(unsigned int w, unsigned int h) {
+void setWindowSize(unsigned int w, unsigned int h) {
 	if (h == 0)
 		h = 1;
 	glViewport(0, 0, w, h);
@@ -202,7 +233,7 @@ public:
 	GLBox() {
 		App = new sf::Window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE, 32), "Click me!");
 
-		setSize(WINDOW_SIZE, WINDOW_SIZE);
+		setWindowSize(WINDOW_SIZE, WINDOW_SIZE);
 		init();
 		while (App->IsOpened()) {
 			App->SetActive();
@@ -218,6 +249,8 @@ public:
 					App->Close();
 
 				if (Event.Type == sf::Event::MouseButtonPressed) {
+
+					//TODO: This is a Test
 					initBoardColors();
 					pickSquares(Event.MouseButton.X, Event.MouseButton.Y);
 					if (lastHitCount != 0) {
@@ -225,15 +258,20 @@ public:
 					} else {
 						initBoardColors();
 					}
-					//printf("pick\n");
 				}
 
 				if (Event.Type == sf::Event::Resized) {
-					setSize(Event.Size.Width, Event.Size.Height);
+					setWindowSize(Event.Size.Width, Event.Size.Height);
 				}
 			}
 
 			display();
+
+			//TODO: This is a Test
+			piece p(3, 3, 'r');
+			piece p2(1, 1, 'b');
+			drawPiece(p);
+			drawPiece(p2);
 
 			App->Display();
 		}
