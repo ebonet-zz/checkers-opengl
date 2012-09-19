@@ -1,11 +1,11 @@
 struct piece {
-	int x,y;
+	int line,column;
 	char pieceType;
 
 
-	piece(int inputX, int inputY, char inputType){
-		this->x = inputX;
-		this->y = inputY;
+	piece(int inputLine, int inputColumn, char inputType){
+		this->line = inputLine;
+		this->column = inputColumn;
 		this->pieceType = inputType;
 	}
 
