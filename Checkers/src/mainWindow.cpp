@@ -23,7 +23,7 @@ GLfloat pieceWidth = boardSquareWidth / 2 - 1;
 const GLfloat WHITE[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat GREY[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
 const GLfloat LIGHT_GREEN[4] = { 0.0f, 0.4f, 0.0f, 1.0f };
-const GLfloat RED[4] = { 0.4f, 0.0f, 0.0f, 1.0f };
+const GLfloat RED[4] = { 0.35f, 0.0f, 0.0f, 1.0f };
 const GLfloat BLACK[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 const GLfloat BEIGE[4] = { 0.3f, 0.3f, 0.1f, 1.0f };
 
@@ -258,6 +258,7 @@ public:
 					} else {
 						initBoardColors();
 					}
+
 				}
 
 				if (Event.Type == sf::Event::Resized) {
