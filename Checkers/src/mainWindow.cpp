@@ -7,11 +7,12 @@
 #define NLINS_BOARD 8
 #define X0 -50.0f
 #define X1 50.0f
-#define Y0 -50.0f
-#define Y1 50.0f
+#define Y0 50.0f
+#define Y1 -50.0f
 
 const GLfloat WHITE[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat GREY[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
+const GLfloat LIGHT_GREEN[4] = { 0.0f, 0.4f, 0.0f, 1.0f };
 
 GLfloat ratio = 1.0f;
 GLfloat eyePositionModifier = 1.0f;
@@ -79,12 +80,12 @@ void drawBoard(GLenum mode) {
 		for (int lin = 0; lin < 8; lin++) {
 			GLfloat y = Y0 + pieceHeight * lin;
 			if (mode == GL_SELECT) {
-				glPushName(7 - lin);
+				glPushName(lin);
 			}
 			glBegin(GL_POLYGON);
 			{
 				glColor4fv(boardColor[col][lin]);
-				glNormal3f(0, 0, 1);
+				glNormal3f(0, 0, -1);
 				glVertex3f(x, y, 0.0f);
 				glVertex3f(x + pieceWidth, y, 0.0f);
 				glVertex3f(x + pieceWidth, y + pieceHeight, 0.0f);
@@ -182,6 +183,18 @@ void pickSquares(int x, int y) {
 	processHits(hits, selectBuf);
 }
 
+void lightSquare(int col, int lin, const GLfloat color[4]) {
+	memcpy(boardColor[col][lin], color, 4 * sizeof(GLfloat));
+}
+
+void restoreSquare(int col, int lin) {
+	if ((col + lin) % 2 == 0) {
+		memcpy(boardColor[col][lin], WHITE, 4 * sizeof(GLfloat));
+	} else {
+		memcpy(boardColor[col][lin], GREY, 4 * sizeof(GLfloat));
+	}
+}
+
 class GLBox {
 public:
 	GLBox() {
@@ -203,7 +216,9 @@ public:
 					App->Close();
 
 				if (Event.Type == sf::Event::MouseButtonPressed) {
+					initBoardColors();
 					pickSquares(Event.MouseButton.X, Event.MouseButton.Y);
+					lightSquare(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
 					//printf("pick\n");
 				}
 

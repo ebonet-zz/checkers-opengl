@@ -42,6 +42,7 @@
 									<listOptionValue builtIn="false" value="sfml-window-d"/>
 									<listOptionValue builtIn="false" value="sfml-system-d"/>
 								</option>
+								<option id="gnu.cpp.link.option.flags.1554192611" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1247045156" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
