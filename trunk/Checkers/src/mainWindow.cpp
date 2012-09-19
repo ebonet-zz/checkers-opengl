@@ -228,7 +228,7 @@ void processHits(GLint hits, GLuint buffer[]) {
 /**
  * Translates the mouse click coordinates into an element selection using OpenGl GL_SELECT render mode.
  */
-void pickSquares(int x, int y) {
+void pickTile(int x, int y) {
 	GLint viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
 
@@ -259,16 +259,16 @@ void pickSquares(int x, int y) {
 }
 
 /**
- * Lights up one of the board tile to the desired new color
+ * Lights up one of the board tiles to the desired new color
  */
-void lightSquare(int col, int lin, const GLfloat color[4]) {
+void lightBoardTile(int col, int lin, const GLfloat color[4]) {
 	memcpy(boardColor[col][lin], color, 4 * sizeof(GLfloat));
 }
 
 /**
  * Brings the board tile to its default color.
  */
-void restoreSquare(int col, int lin) {
+void restoreBoardTile(int col, int lin) {
 	if ((col + lin) % 2 == 0) {
 		memcpy(boardColor[col][lin], WHITE, 4 * sizeof(GLfloat));
 	} else {
@@ -300,9 +300,9 @@ public:
 
 					//TODO: This is a Test
 					initBoardColors();
-					pickSquares(Event.MouseButton.X, Event.MouseButton.Y);
+					pickTile(Event.MouseButton.X, Event.MouseButton.Y);
 					if (lastHitCount != 0) {
-						lightSquare(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
+						lightBoardTile(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
 					} else {
 						initBoardColors();
 					}
