@@ -28,6 +28,7 @@ GLfloat POS[2][4] = { { 50.0f, 50.0f, 100.0f, 1.0f }, { -50.0f, -50.0f, 20.0f, 1
 GLfloat boardColor[8][8][4];
 
 int lastSelectedCoordinates[2];
+int lastHitCount = 0;
 
 void initBoardColors() {
 	for (int col = 0; col < 8; col++) {
@@ -133,6 +134,7 @@ void processHits(GLint hits, GLuint buffer[]) {
 	GLuint names, *bufferIntegerPointer;
 
 	printf("hits = %d\n", hits);
+	lastHitCount = hits;
 	bufferIntegerPointer = (GLuint *) buffer;
 	for (int i = 0; i < hits; i++) { /*  for each hit  */
 		names = *bufferIntegerPointer;
@@ -218,7 +220,11 @@ public:
 				if (Event.Type == sf::Event::MouseButtonPressed) {
 					initBoardColors();
 					pickSquares(Event.MouseButton.X, Event.MouseButton.Y);
-					lightSquare(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
+					if (lastHitCount != 0) {
+						lightSquare(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
+					} else {
+						initBoardColors();
+					}
 					//printf("pick\n");
 				}
 
