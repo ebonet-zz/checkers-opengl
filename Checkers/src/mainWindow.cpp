@@ -10,12 +10,12 @@
 #define Y0 -50.0f
 #define Y1 50.0f
 
-GLfloat WHITE[4] = {1.0f,1.0f,1.0f,1.0f};
-GLfloat GREY[4] = {0.2f,0.2f,0.2f,1.0f};
+const GLfloat WHITE[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+const GLfloat GREY[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
 
 GLfloat ratio = 1.0f;
 GLfloat eyePositionModifier = 1.0f;
-GLfloat eyePositionX = 100.0f;
+GLfloat eyePositionX = -100.0f;
 GLfloat eyePositionY = 0.0f;
 GLfloat eyePositionZ = 80.0f;
 
@@ -65,18 +65,20 @@ void init() {
 	initBoardColors();
 }
 
-void drawBoard(GLenum mode)
-{
-	GLfloat pieceWidth = (X1-X0)/NCOLS_BOARD;
-	GLfloat pieceHeight = (Y1-Y0)/NLINS_BOARD;
+void drawBoard(GLenum mode) {
+	GLfloat pieceWidth = (X1 - X0) / NCOLS_BOARD;
+	GLfloat pieceHeight = (Y1 - Y0) / NLINS_BOARD;
 
 	for (int col = 0; col < 8; col++) {
 		GLfloat x = X0 + pieceWidth * col;
+		if (mode == GL_SELECT) {
+			glLoadName(col);
+		}
 		for (int lin = 0; lin < 8; lin++) {
 			GLfloat y = Y0 + pieceHeight * lin;
-
-			// TODO: set names for picking
-
+			if (mode == GL_SELECT) {
+				glPushName(7 - lin);
+			}
 			glBegin(GL_POLYGON);
 			{
 				glColor4fv(boardColor[col][lin]);
@@ -87,16 +89,19 @@ void drawBoard(GLenum mode)
 				glVertex3f(x, y + pieceHeight, 0.0f);
 			}
 			glEnd();
+			if (mode == GL_SELECT) {
+				glPopName();
+			}
 		}
 	}
 }
 
-void display(void)
-{
+void display(void) {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-	gluLookAt(eyePositionX / eyePositionModifier, eyePositionY / eyePositionModifier, eyePositionZ / eyePositionModifier, 0, 0, 0, 0, 0, 1);
+	gluLookAt(eyePositionX / eyePositionModifier, eyePositionY / eyePositionModifier,
+			eyePositionZ / eyePositionModifier, 0, 0, 0, 0, 0, 1);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -105,8 +110,7 @@ void display(void)
 	glFlush();
 }
 
-void setSize(unsigned int w, unsigned int h)
-{
+void setSize(unsigned int w, unsigned int h) {
 	if (h == 0)
 		h = 1;
 	glViewport(0, 0, w, h);
@@ -118,22 +122,74 @@ void setSize(unsigned int w, unsigned int h)
 	gluPerspective(60, ratio, 0.5, 500.0);
 }
 
-class GLBox
-{
+/*  processHits prints out the contents of the selection array.  */
+void processHits(GLint hits, GLuint buffer[]) {
+
+	// Method extracted from the example. Won't touch it because its ugly.
+	// I'm gonna treat it like a black box.
+	GLuint names, *ptr;
+
+	printf("hits = %d\n", hits);
+	ptr = (GLuint *) buffer;
+	for (int i = 0; i < hits; i++) { /*  for each hit  */
+		names = *ptr;
+		//printf(" number of names for this hit = %d\n", names);
+		ptr++;
+		//printf("  z1 is %g;", (float) *ptr / 0x7fffffff);
+		ptr++;
+		//printf(" z2 is %g\n", (float) *ptr / 0x7fffffff);
+		ptr++;
+		printf("   names are ");
+		for (GLuint j = 0; j < names; j++) { /*  for each name */
+			printf("%d ", *ptr);
+			ptr++;
+		}
+		printf("\n");
+	}
+}
+
+void pickSquares(int x, int y) {
+	GLint viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+
+	GLuint selectBuf[WINDOW_SIZE];
+	glSelectBuffer(WINDOW_SIZE, selectBuf);
+
+	glRenderMode(GL_SELECT);
+
+	glInitNames();
+	glPushName(0);
+
+	glMatrixMode(GL_PROJECTION);
+	glPushMatrix();
+	glLoadIdentity();
+
+	/* 	 create 5x5 pixel picking region near cursor location	*/
+	gluPickMatrix((GLdouble) x, (GLdouble) (viewport[3] - y), 5.0, 5.0, viewport);
+
+	gluPerspective(60, ratio, 0.5, 500.0);
+	drawBoard(GL_SELECT);
+
+	glMatrixMode(GL_PROJECTION);
+	glPopMatrix();
+	glFlush();
+
+	GLint hits = glRenderMode(GL_RENDER);
+	processHits(hits, selectBuf);
+}
+
+class GLBox {
 public:
-	GLBox()
-	{
+	GLBox() {
 		App = new sf::Window(sf::VideoMode(WINDOW_SIZE, WINDOW_SIZE, 32), "Click me!");
 
 		setSize(WINDOW_SIZE, WINDOW_SIZE);
 		init();
-		while (App->IsOpened())
-		{
+		while (App->IsOpened()) {
 			App->SetActive();
 
 			sf::Event Event;
-			while (App->GetEvent(Event))
-			{
+			while (App->GetEvent(Event)) {
 				// Close window : exit
 				if (Event.Type == sf::Event::Closed)
 					App->Close();
@@ -142,14 +198,12 @@ public:
 				if ((Event.Type == sf::Event::KeyPressed) && (Event.Key.Code == sf::Key::Escape))
 					App->Close();
 
-				if (Event.Type == sf::Event::MouseButtonPressed)
-				{
-					//pickSquares(Event.MouseButton.X, Event.MouseButton.Y);
+				if (Event.Type == sf::Event::MouseButtonPressed) {
+					pickSquares(Event.MouseButton.X, Event.MouseButton.Y);
 					//printf("pick\n");
 				}
 
-				if (Event.Type == sf::Event::Resized)
-				{
+				if (Event.Type == sf::Event::Resized) {
 					setSize(Event.Size.Width, Event.Size.Height);
 				}
 			}
@@ -164,9 +218,7 @@ private:
 	sf::Window *App;
 };
 
-
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
 	init();
 	GLBox prog;
 	return EXIT_SUCCESS;
