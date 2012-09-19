@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <SFML/Window.hpp>
-#include "board.cpp"
 
 #define BUFSIZE 900
 #define NCOLS_BOARD 8
@@ -10,6 +9,8 @@
 #define X1 50.0f
 #define Y0 -50.0f
 #define Y1 50.0f
+#define WHITE 1
+#define GREY 2
 
 GLfloat ratio = 1.0f;
 GLfloat eyePositionModifier = 1.0f;
@@ -22,12 +23,46 @@ GLfloat DIF[4] = { 0.9f, 0.9f, 0.9f, 1.0f };
 GLfloat ESP[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 GLfloat POS[2][4] = { { 50.0f, 50.0f, 100.0f, 1.0f }, { -50.0f, -50.0f, 20.0f, 1.0f } };
 
+GLfloat* color[8][8];
+
 void drawBoard(GLenum mode)
 {
 	GLfloat pieceWidth = (X1-X0)/NCOLS_BOARD;
 	GLfloat pieceHeight = (Y1-Y0)/NLINS_BOARD;
-	Board b;
-	b.drawChessBoard(X0, Y0, pieceWidth, pieceHeight, NCOLS_BOARD, NLINS_BOARD);
+
+	for (int col = 0; col < 8; col++) {
+		GLfloat x = X0 + pieceWidth * col;
+		for (int lin = 0; lin < 8; lin++) {
+			GLfloat y = Y0 + pieceHeight * lin;
+
+			// TODO: set names for picking
+
+			glBegin(GL_POLYGON);
+			{
+				glColor4fv(color[col][lin]);
+				glNormal3f(0, 0, 1);
+				glVertex3f(x, y, 0.0f);
+				glVertex3f(x + pieceWidth, y, 0.0f);
+				glVertex3f(x + pieceWidth, y + pieceHeight, 0.0f);
+				glVertex3f(x, y + pieceHeight, 0.0f);
+			}
+			glEnd();
+		}
+	}
+}
+
+void initBoardColors() {
+	for (int col = 0; col < 8; col++) {
+		for (int lin = 0; lin < 8; lin++) {
+			if ((col + lin) % 2 == 0) {
+				GLfloat c[4] = {1.0f,1.0f,1.0f,1.0f};
+				color[col][lin] = c;
+			} else {
+				GLfloat c[4] = {0.2f,0.2f,0.2f,1.0f};
+				color[col][lin] = c;
+			}
+		}
+	}
 }
 
 void init() {
@@ -53,6 +88,8 @@ void init() {
 
 	glMaterialfv(GL_FRONT, GL_AMBIENT, AMB);
 	glMateriali(GL_FRONT, GL_SHININESS, 7);
+
+	initBoardColors();
 }
 
 void display(void)
@@ -63,6 +100,7 @@ void display(void)
 	gluLookAt(eyePositionX / eyePositionModifier, eyePositionY / eyePositionModifier, eyePositionZ / eyePositionModifier, 0, 0, 0, 0, 0, 1);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	drawBoard(GL_RENDER);
 
 	glFlush();
