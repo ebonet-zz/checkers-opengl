@@ -26,6 +26,8 @@ GLfloat POS[2][4] = { { 50.0f, 50.0f, 100.0f, 1.0f }, { -50.0f, -50.0f, 20.0f, 1
 
 GLfloat boardColor[8][8][4];
 
+int lastSelectedCoordinates[2];
+
 void initBoardColors() {
 	for (int col = 0; col < 8; col++) {
 		for (int lin = 0; lin < 8; lin++) {
@@ -127,22 +129,24 @@ void processHits(GLint hits, GLuint buffer[]) {
 
 	// Method extracted from the example. Won't touch it because its ugly.
 	// I'm gonna treat it like a black box.
-	GLuint names, *ptr;
+	GLuint names, *bufferIntegerPointer;
 
 	printf("hits = %d\n", hits);
-	ptr = (GLuint *) buffer;
+	bufferIntegerPointer = (GLuint *) buffer;
 	for (int i = 0; i < hits; i++) { /*  for each hit  */
-		names = *ptr;
+		names = *bufferIntegerPointer;
 		//printf(" number of names for this hit = %d\n", names);
-		ptr++;
+		bufferIntegerPointer++;
 		//printf("  z1 is %g;", (float) *ptr / 0x7fffffff);
-		ptr++;
-		//printf(" z2 is %g\n", (float) *ptr / 0x7fffffff);
-		ptr++;
+		bufferIntegerPointer++;
+		//printf(" z2 is %g\n", (float) *bufferIntegerPointer / 0x7fffffff);
+		bufferIntegerPointer++;
 		printf("   names are ");
+
 		for (GLuint j = 0; j < names; j++) { /*  for each name */
-			printf("%d ", *ptr);
-			ptr++;
+			lastSelectedCoordinates[j] = *bufferIntegerPointer;
+			printf("%d ", *bufferIntegerPointer);
+			bufferIntegerPointer++;
 		}
 		printf("\n");
 	}
