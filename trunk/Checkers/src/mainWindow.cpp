@@ -381,7 +381,7 @@ bool wasBoardHit(int col, int lin) {
 }
 
 bool wasButtonHit(int col, int lin) {
-	return col >= 57 && col <= 58 && lin >= 0 && lin <= 2;
+	return col >= BUTTON_1_NAME && col <= BUTTON_2_NAME && lin >= 0 && lin <= 2;
 }
 
 /**
@@ -397,7 +397,7 @@ void lightButton(int col, int lin, const GLfloat color[4]) {
 	if (wasButtonHit(col, lin)) {
 		lin = 0;
 
-		if (col == 57) {
+		if (col == BUTTON_1_NAME) {
 			col = 0;
 		} else {
 			col = 1;
