@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <SFML/Window.hpp>
 #include <stack>
-#include "piece.cpp"
 #include "checkersCore.cpp"
 
 // Defines and constants
@@ -57,6 +56,7 @@ GLfloat pieceWidth = boardTileWidth / 2 - 1;
 
 // Board color state
 GLfloat boardColor[8][8][4];
+GLfloat buttonsColor[2][1][4];
 
 // Mouse click selection results
 int lastSelectedCoordinates[2];
@@ -78,6 +78,18 @@ void initBoardColors() {
 				memcpy(boardColor[col][lin], WHITE, 4 * sizeof(GLfloat));
 			} else {
 				memcpy(boardColor[col][lin], BEIGE, 4 * sizeof(GLfloat));
+			}
+		}
+	}
+}
+
+void initButtonsColors() {
+	for (int col = 0; col < 2; col++) {
+		for (int lin = 0; lin < 1; lin++) {
+			if ((col + lin) % 2 == 0) {
+				memcpy(buttonsColor[col][lin], WHITE, 4 * sizeof(GLfloat));
+			} else {
+				memcpy(buttonsColor[col][lin], WHITE, 4 * sizeof(GLfloat));
 			}
 		}
 	}
@@ -112,6 +124,7 @@ void init() {
 	glMateriali(GL_FRONT, GL_SHININESS, 7);
 
 	initBoardColors();
+	initButtonsColors();
 }
 
 /**
@@ -173,7 +186,44 @@ void drawPiece(piece p) {
 }
 
 void drawMenuButtons(GLenum mode) {
-	//TODO:
+	GLfloat x = X0 - 15;
+	GLfloat y = Y0 - 36;
+	if (mode == GL_SELECT) {
+		glLoadName(BUTTON_1_NAME);
+		glPushName(1);
+	}
+	glBegin(GL_POLYGON);
+	{
+		glColor4fv(buttonsColor[0][0]);
+		glNormal3f(0, 0, -1);
+		glVertex3f(x, y, 0.0f);
+		glVertex3f(x + boardTileWidth, y, 0.0f);
+		glVertex3f(x + boardTileWidth, y + boardTileHeight, 0.0f);
+		glVertex3f(x, y + boardTileHeight, 0.0f);
+	}
+	glEnd();
+	if (mode == GL_SELECT) {
+		glPopName();
+	}
+
+	y = Y0 - 52;
+	if (mode == GL_SELECT) {
+		glLoadName(BUTTON_2_NAME);
+		glPushName(2);
+	}
+	glBegin(GL_POLYGON);
+	{
+		glColor4fv(buttonsColor[1][0]);
+		glNormal3f(0, 0, -1);
+		glVertex3f(x, y, 0.0f);
+		glVertex3f(x + boardTileWidth, y, 0.0f);
+		glVertex3f(x + boardTileWidth, y + boardTileHeight, 0.0f);
+		glVertex3f(x, y + boardTileHeight, 0.0f);
+	}
+	glEnd();
+	if (mode == GL_SELECT) {
+		glPopName();
+	}
 }
 
 /**
@@ -253,7 +303,7 @@ void processHits(GLint hits, GLuint buffer[]) {
 /**
  * Translates the mouse click coordinates into an element selection using OpenGl GL_SELECT render mode.
  */
-void pickTile(int x, int y) {
+void handleClick(int x, int y) {
 	GLint viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
 
@@ -284,11 +334,35 @@ void pickTile(int x, int y) {
 	processHits(hits, selectBuf);
 }
 
+bool wasBoardHit(int col, int lin) {
+	return col >= 0 && col <= 7 && lin >= 0 && lin <= 7;
+}
+
+bool wasButtonHit(int col, int lin) {
+	return col >= 57 && col <= 58 && lin >= 0 && lin <= 2;
+}
+
 /**
  * Lights up one of the board tiles to the desired new color
  */
 void lightBoardTile(int col, int lin, const GLfloat color[4]) {
-	memcpy(boardColor[col][lin], color, 4 * sizeof(GLfloat));
+	if (wasBoardHit(col, lin)) {
+		memcpy(boardColor[col][lin], color, 4 * sizeof(GLfloat));
+	}
+}
+
+void lightButton(int col, int lin, const GLfloat color[4]) {
+	if (wasButtonHit(col, lin)) {
+		lin = 0;
+
+		if (col == 57) {
+			col = 0;
+		} else {
+			col = 1;
+		}
+
+		memcpy(buttonsColor[col][lin], color, 4 * sizeof(GLfloat));
+	}
 }
 
 /**
@@ -326,13 +400,19 @@ public:
 
 					//TODO: This is a Test
 					initBoardColors();
-					pickTile(Event.MouseButton.X, Event.MouseButton.Y);
+					initButtonsColors();
+					handleClick(Event.MouseButton.X, Event.MouseButton.Y);
 					if (lastHitCount != 0) {
-						lightBoardTile(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
+						if (wasBoardHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
+							lightBoardTile(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
+						}
+						if (wasButtonHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
+							lightButton(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
+						}
 					} else {
 						initBoardColors();
+						initButtonsColors();
 					}
-
 				}
 
 				if ((Event.Type == sf::Event::KeyPressed) && (Event.Key.Code == sf::Key::Right)) {
