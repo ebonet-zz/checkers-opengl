@@ -5,7 +5,6 @@
  *      Author: BONET
  */
 
-
 #ifndef CHECKERSCORE_H_
 #define CHECKERSCORE_H_
 
@@ -13,7 +12,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stack>
-#include <cmath>
 #include "piece.h"
 #include "coordinate.h"
 #include "gameGrid.h"
@@ -26,8 +24,7 @@
  * This class is responsible to handle the logic behind the checkers game
  */
 
-
-class CheckersCore{
+class CheckersCore {
 
 public:
 	CheckersCore();
@@ -35,28 +32,27 @@ public:
 
 	bool makeMove(Coordinate, Coordinate);
 
-	bool isThisMoveValid(Coordinate,Coordinate);
+	bool isThisMoveValid(Coordinate, Coordinate);
 
-	void updateBoardState(int [8][8],Coordinate);
+	void updateBoardState(int[8][8], Coordinate);
 
-	void updateBoardState(int [8][8]);
+	void updateBoardState(int[8][8]);
 
 	std::stack<piece> getPieces();
 
 	int isGameWon(void);
 
-	void restartGame();//TODO: Implement this
+	void restartGame(); //TODO: Implement this
 
 	int getCurrentPlayer();
 
 private:
 
-	int average(int,int);
+	int average(int, int);
 
 	void initializeGame();
 
 	std::stack<piece> updatePawnsOnBoard();
-
 
 	/**
 	 * The current state of the game
@@ -74,7 +70,5 @@ private:
 	int PlayerInTurn;
 	int nPiecesOnBoard[2];
 };
-
-
 
 #endif /* CHECKERSCORE_H_ */

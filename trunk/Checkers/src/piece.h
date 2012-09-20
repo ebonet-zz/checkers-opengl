@@ -18,5 +18,4 @@ struct piece {
 
 };
 
-
 #endif /* PIECE_H_ */

@@ -8,7 +8,7 @@
 #ifndef GAMEGRID_H_
 #define GAMEGRID_H_
 
-struct GameGrid{
+struct GameGrid {
 
 	char GameGridMatrix[8][8];
 
@@ -18,7 +18,7 @@ struct GameGrid{
 
 	char getCellAt(Coordinate);
 
-	char getCellAt(int,int);
+	char getCellAt(int, int);
 
 	bool isEmptyCell(Coordinate);
 
@@ -34,6 +34,5 @@ struct GameGrid{
 
 	void createInitialGrid();
 };
-
 
 #endif /* GAMEGRID_H_ */
