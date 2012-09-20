@@ -15,6 +15,12 @@
 #define X1 50.0f
 #define Y0 50.0f
 #define Y1 -50.0f
+#define BUTTON_1_NAME 57
+#define BUTTON_2_NAME 58
+#define RIGHT 1
+#define LEFT -1
+#define UP 1
+#define DOWN -1
 
 // Colors
 const GLfloat WHITE[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
@@ -23,6 +29,8 @@ const GLfloat LIGHT_GREEN[4] = { 0.0f, 0.4f, 0.0f, 1.0f };
 const GLfloat RED[4] = { 0.35f, 0.0f, 0.0f, 1.0f };
 const GLfloat BLACK[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 const GLfloat BEIGE[4] = { 0.3f, 0.3f, 0.1f, 1.0f };
+const GLfloat BUTTON_1[4] = { 0.35f, 0.0f, 0.0f, 1.0f };
+const GLfloat BUTTON_2[4] = { 0.3f, 0.3f, 0.3f, 1.0f };
 
 // Camera and positioning
 GLfloat ratio = 1.0f;
@@ -30,6 +38,9 @@ GLfloat eyePositionModifier = 1.0f;
 GLfloat eyePositionX = -100.0f;
 GLfloat eyePositionY = 0.0f;
 GLfloat eyePositionZ = 80.0f;
+GLfloat leftRightRotationAngle = 0;
+GLfloat upDownRotationAngle = 0;
+GLfloat rotationSpeed = 1;
 
 // Lights
 GLfloat AMB[4] = { 0.3f, 0.3f, 0.3f, 1.0f };
@@ -147,7 +158,7 @@ void drawPiece(piece p) {
 		glColor4fv(GREY);
 	}
 
-	glTranslatef(X0 + boardTileWidth * p.column, Y0 + boardTileHeight * p.line, 0);
+	glTranslatef(X0 + boardTileWidth * p.column, Y0 + boardTileHeight * p.line, 0.1);
 	glTranslatef(boardTileWidth / 2, boardTileHeight / 2, 0);
 
 	gluDisk(gluNewQuadric(), 0, pieceWidth, ROUND_PRECISION, ROUND_PRECISION);
@@ -155,6 +166,10 @@ void drawPiece(piece p) {
 	glTranslatef(0, 0, pieceHeight);
 	gluDisk(gluNewQuadric(), 0, pieceWidth, ROUND_PRECISION, ROUND_PRECISION);
 	glPopMatrix();
+}
+
+void drawMenuButtons(GLenum mode) {
+	//TODO:
 }
 
 /**
@@ -169,6 +184,10 @@ void display(void) {
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glRotatef(leftRightRotationAngle, 0, 0, 1);
+
+	glRotatef(upDownRotationAngle, 0, 1, 0);
+
 	drawBoard(GL_RENDER);
 
 	//TODO: This is a Test
@@ -176,6 +195,8 @@ void display(void) {
 	piece p2(1, 1, 'b');
 	drawPiece(p);
 	drawPiece(p2);
+
+	drawMenuButtons(GL_RENDER);
 
 	glFlush();
 }
@@ -249,6 +270,7 @@ void pickTile(int x, int y) {
 
 	gluPerspective(60, ratio, 0.5, 500.0);
 	drawBoard(GL_SELECT);
+	drawMenuButtons(GL_SELECT);
 
 	glMatrixMode(GL_PROJECTION);
 	glPopMatrix();
@@ -309,6 +331,22 @@ public:
 
 				}
 
+				if ((Event.Type == sf::Event::KeyPressed) && (Event.Key.Code == sf::Key::Right)) {
+					handleHorizontalCameraMove(RIGHT);
+				}
+
+				if ((Event.Type == sf::Event::KeyPressed) && (Event.Key.Code == sf::Key::Left)) {
+					handleHorizontalCameraMove(LEFT);
+				}
+
+				if ((Event.Type == sf::Event::KeyPressed) && (Event.Key.Code == sf::Key::Up)) {
+					handleVerticalCameraMove(UP);
+				}
+
+				if ((Event.Type == sf::Event::KeyPressed) && (Event.Key.Code == sf::Key::Down)) {
+					handleVerticalCameraMove(DOWN);
+				}
+
 				if (Event.Type == sf::Event::Resized) {
 					setWindowSize(Event.Size.Width, Event.Size.Height);
 				}
@@ -318,6 +356,14 @@ public:
 
 			App->Display();
 		}
+	}
+
+	void handleHorizontalCameraMove(int direction) {
+		leftRightRotationAngle += rotationSpeed * direction;
+	}
+
+	void handleVerticalCameraMove(int direction) {
+		upDownRotationAngle += rotationSpeed * direction;
 	}
 
 private:
