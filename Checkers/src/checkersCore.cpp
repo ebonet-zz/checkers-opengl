@@ -139,7 +139,7 @@ void CheckersCore::updateBoardState(int oldState[8][8], Coordinate SelectedTile)
 				oldState[row][column] = 1;
 			}
 
-			else if (isThisMoveValid(SelectedTile, Coordinate(row, column))) {
+			else if (CurrentGameState.isEmptyCell(Coordinate(row, column))) {
 				oldState[row][column] = 0;
 			}
 		}
@@ -160,11 +160,56 @@ void CheckersCore::updateBoardState(int oldState[8][8]) {
 	}
 }
 
+std::list<Coordinate> CheckersCore::getPossibleMoves(Coordinate SelectedTile) {
+	int row, column;
+	std::list<Coordinate> valids;
+	for (row = 0; row < 8; row++) {
+		for (column = 0; column < 8; column++) {
+			Coordinate currentCoordinate(row, column);
+			if (isThisMoveValid(SelectedTile, currentCoordinate)) {
+				valids.push_back(currentCoordinate);
+			}
+		}
+	}
+	return valids;
+}
+
 /**
  * Checks if a move is valid or not
  */
 
 bool CheckersCore::isThisMoveValid(Coordinate oldCoordinate, Coordinate newCoordinate) {
+
+	if (isImmediateMove(oldCoordinate, newCoordinate)) {
+		return true;
+	}
+
+	if (isChainEatingMove(oldCoordinate, newCoordinate)) {
+		return true;
+	}
+
+	return false;
+}
+
+bool CheckersCore::isChainEatingMove(Coordinate oldCoordinate, Coordinate newCoordinate) {
+	if (isEatingMove(oldCoordinate, newCoordinate)) {
+		return true;
+	}
+
+	list<Coordinate> possibleMoves = getPossibleMoves(oldCoordinate);
+	for (list<Coordinate>::iterator it = possibleMoves.begin(); it != possibleMoves.end(); it++) {
+		if (isEatingMove(oldCoordinate, *it)) {
+			return isChainEatingMove(*it, newCoordinate);
+		}
+	}
+	return false;
+}
+
+bool CheckersCore::isEatingMove(Coordinate oldCoordinate, Coordinate newCoordinate) {
+	if (oldCoordinate.row < 0 || oldCoordinate.row > 7 || oldCoordinate.column < 0 || oldCoordinate.column > 7
+			|| newCoordinate.row < 0 || newCoordinate.row > 7 || newCoordinate.column < 0 || newCoordinate.column > 7) {
+		return false;
+	}
 
 	cout << "Origin: " << oldCoordinate.row << "," << oldCoordinate.column << endl;
 	cout << "Target: " << newCoordinate.row << "," << newCoordinate.column << endl;
@@ -174,13 +219,7 @@ bool CheckersCore::isThisMoveValid(Coordinate oldCoordinate, Coordinate newCoord
 		return false;
 	}
 
-	// if the coordinate is a neighbor emtpy space the move is valid
-	if (oldCoordinate.isDiagonalNeighbor(newCoordinate)) {
-		cout << "Valid move: The target coordinate is empty" << endl;
-		return true;
-	}
-
-	// The las valid movement happens when an enemy piece is being killed
+	// The last valid movement happens when an enemy piece is being killed
 	if (abs(oldCoordinate.row - newCoordinate.row) == 2 && abs(oldCoordinate.row - newCoordinate.row) == 2) {
 		cout << "Testing if jumping is valid" << endl;
 		Coordinate midPoint;
@@ -189,6 +228,29 @@ bool CheckersCore::isThisMoveValid(Coordinate oldCoordinate, Coordinate newCoord
 		midPoint.column = average(oldCoordinate.column, newCoordinate.column);
 
 		return CurrentGameState.isEnemyPiece(oldCoordinate, midPoint);
+	}
+
+	return false;
+}
+
+bool CheckersCore::isImmediateMove(Coordinate oldCoordinate, Coordinate newCoordinate) {
+	if (oldCoordinate.row < 0 || oldCoordinate.row > 7 || oldCoordinate.column < 0 || oldCoordinate.column > 7
+			|| newCoordinate.row < 0 || newCoordinate.row > 7 || newCoordinate.column < 0 || newCoordinate.column > 7) {
+		return false;
+	}
+
+	cout << "Origin: " << oldCoordinate.row << "," << oldCoordinate.column << endl;
+	cout << "Target: " << newCoordinate.row << "," << newCoordinate.column << endl;
+	// if there's a piece the move is invalid
+	if (!CurrentGameState.isEmptyCell(newCoordinate)) {
+		cout << "Invalid move: The target coordinate is not empty" << endl;
+		return false;
+	}
+
+	// if the coordinate is a neighbor empty space the move is valid
+	if (oldCoordinate.isDiagonalNeighbor(newCoordinate)) {
+		cout << "Valid move: The target coordinate is empty" << endl;
+		return true;
 	}
 
 	return false;
