@@ -77,9 +77,9 @@ void initBoardColors() {
 	for (int col = 0; col < 8; col++) {
 		for (int lin = 0; lin < 8; lin++) {
 			if ((col + lin) % 2 == 0) {
-				memcpy(boardColor[col][lin], BEIGE, 4 * sizeof(GLfloat));
-			} else {
 				memcpy(boardColor[col][lin], WHITE, 4 * sizeof(GLfloat));
+			} else {
+				memcpy(boardColor[col][lin], BEIGE, 4 * sizeof(GLfloat));
 			}
 		}
 	}
@@ -130,18 +130,11 @@ void init() {
 	pieceList = GameCore.getPieces();
 }
 
-/**
- * Reads the current board color state and draws the alternated squares.
- * Naming happens here in order to allow picking with GL_SELECT render mode.
- *
- * Param mode - The current OpenGl rendering mode.
- */
-void drawBoard(GLenum mode) {
-
+void drawBoardBorders() {
 	/* Board Lower Face*/
 	glBegin(GL_POLYGON);
 	{
-		glNormal3f(0,0,-1);
+		glNormal3f(0, 0, -1);
 		glColor4fv(GREY);
 		glVertex3f(X0, Y0, -4.0f);
 		glVertex3f(X0, Y1, -4.0f);
@@ -149,31 +142,33 @@ void drawBoard(GLenum mode) {
 		glVertex3f(X1, Y1, -4.0f);
 		glVertex3f(X1, Y0, -4.0f);
 
-
-	}glEnd();
+	}
+	glEnd();
 
 	/* Board Grey Face*/
 	glBegin(GL_POLYGON);
 	{
 		glColor4fv(GREY);
 
-		glNormal3f(0,-1,0);
+		glNormal3f(0, -1, 0);
 		glVertex3f(X0, Y1, -4.00f);
 		glVertex3f(X0, Y0, -4.00f);
 		glVertex3f(X0, Y0, 0.00f);
 		glVertex3f(X0, Y1, 0.00f);
-	}glEnd();
+	}
+	glEnd();
 
 	/* Board Red Face*/
 	glBegin(GL_POLYGON);
 	{
 		glColor4fv(RED);
-		glNormal3f(0,-1,0);
+		glNormal3f(0, -1, 0);
 		glVertex3f(X1, Y1, -4.00f);
 		glVertex3f(X1, Y0, -4.00f);
 		glVertex3f(X1, Y0, 0.00f);
 		glVertex3f(X1, Y1, 0.00f);
-	}glEnd();
+	}
+	glEnd();
 
 	/* Board Right Face*/
 	glBegin(GL_POLYGON);
@@ -185,8 +180,10 @@ void drawBoard(GLenum mode) {
 		glColor4fv(RED);
 		glVertex3f(X1, Y1, -4.00f);
 		glVertex3f(X1, Y1, 0.00f);
-	}glEnd();
+	}
+	glEnd();
 
+	/* Board Left Face*/
 	glBegin(GL_POLYGON);
 	{
 		glColor4fv(GREY);
@@ -196,14 +193,23 @@ void drawBoard(GLenum mode) {
 		glColor4fv(RED);
 		glVertex3f(X1, Y0, -4.00f);
 		glVertex3f(X1, Y0, 0.00f);
-	}glEnd();
+	}
+	glEnd();
 
-	/* Board Left Face*/
+}
+
+/**
+ * Reads the current board color state and draws the alternated squares.
+ * Naming happens here in order to allow picking with GL_SELECT render mode.
+ *
+ * Param mode - The current OpenGl rendering mode.
+ */
+void drawBoard(GLenum mode) {
 
 	for (int col = 0; col < 8; col++) {
 		GLfloat x = X0 + boardTileWidth * col;
 		if (mode == GL_SELECT) {
-			glLoadName(col);
+			glLoadName(7 - col);
 		}
 		for (int lin = 0; lin < 8; lin++) {
 			GLfloat y = Y0 + boardTileHeight * lin;
@@ -212,7 +218,7 @@ void drawBoard(GLenum mode) {
 			}
 			glBegin(GL_POLYGON);
 			{
-				glColor4fv(boardColor[col][lin]);
+				glColor4fv(boardColor[7 - col][lin]);
 				glNormal3f(0, 0, -1);
 				glVertex3f(x, y, 0.0f);
 				glVertex3f(x + boardTileWidth, y, 0.0f);
@@ -245,7 +251,7 @@ void drawPiece(piece p) {
 		glColor4fv(GREY);
 	}
 
-	glTranslatef(X0 + boardTileWidth *(7-p.line) , Y0 + boardTileHeight *(p.column), 0.1);
+	glTranslatef(X0 + boardTileWidth * (7 - p.line), Y0 + boardTileHeight * (p.column), 0.1);
 	glTranslatef(boardTileWidth / 2, boardTileHeight / 2, 0);
 
 	gluDisk(gluNewQuadric(), 0, pieceWidth, ROUND_PRECISION, ROUND_PRECISION);
@@ -335,10 +341,11 @@ void display(void) {
 	glRotatef(upDownRotationAngle, 0, 1, 0);
 
 	drawBoard(GL_RENDER);
+	drawBoardBorders();
 
-	unsigned int i=0;
+	unsigned int i = 0;
 
-	while(i<pieceList.size()){
+	while (i < pieceList.size()) {
 		Piece somePiece = pieceList.front();
 		drawPiece(somePiece);
 		pieceList.pop();
@@ -346,15 +353,14 @@ void display(void) {
 		i++;
 	}
 	/*
-	for (list<piece>::iterator it = pieceList.begin(); it != pieceList.end(); it++){
-		drawPiece(*it);
-	}*/
+	 for (list<piece>::iterator it = pieceList.begin(); it != pieceList.end(); it++){
+	 drawPiece(*it);
+	 }*/
 
 //	piece p(3, 3, 'r');
 //	piece p2(1, 1, 'b');
 //	drawPiece(p);
 //	drawPiece(p2);
-
 	drawMenuButtons(GL_RENDER);
 
 	glFlush();
@@ -394,14 +400,14 @@ void processHits(GLint hits, GLuint buffer[]) {
 		bufferIntegerPointer++;
 		//printf(" z2 is %g\n", (float) *bufferIntegerPointer / 0x7fffffff);
 		bufferIntegerPointer++;
-		printf("   names are ");
+		cout << "   names are ";
 
 		for (GLuint j = 0; j < names; j++) { /*  for each name */
 			lastSelectedCoordinates[j] = *bufferIntegerPointer;
-			printf("%d ", *bufferIntegerPointer);
+			cout << *bufferIntegerPointer << " ";
 			bufferIntegerPointer++;
 		}
-		printf("\n");
+		cout << endl;
 	}
 }
 
@@ -428,6 +434,7 @@ void handleClick(int x, int y) {
 	gluPickMatrix((GLdouble) x, (GLdouble) (viewport[3] - y), 2.0, 2.0, viewport);
 
 	gluPerspective(60, ratio, 0.5, 500.0);
+
 	drawBoard(GL_SELECT);
 	drawMenuButtons(GL_SELECT);
 
@@ -509,9 +516,9 @@ public:
 					handleClick(Event.MouseButton.X, Event.MouseButton.Y);
 					if (lastHitCount != 0) {
 
-						if (wasBoardHit(7-lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
-							cout << 7-lastSelectedCoordinates[0] << ", " << lastSelectedCoordinates[1] << endl;
-							if(GameCore.isTileSelectable(Coordinate(7-lastSelectedCoordinates[0],lastSelectedCoordinates[1]))){
+						if (wasBoardHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
+							if (GameCore.isTileSelectable(
+									Coordinate(lastSelectedCoordinates[0], lastSelectedCoordinates[1]))) {
 
 								lightBoardTile(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
 							}
