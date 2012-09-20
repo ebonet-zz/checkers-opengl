@@ -2,8 +2,9 @@
 #include <stdio.h>
 #include <SFML/Window.hpp>
 #include <stack>
-#include "piece.cpp"
-#include "glyphs.h"
+#include "piece.h"
+#include "checkersCore.h"
+
 
 // Defines and constants
 #define ROUND_PRECISION 50
@@ -30,8 +31,8 @@ const GLfloat LIGHT_GREEN[4] = { 0.0f, 0.4f, 0.0f, 1.0f };
 const GLfloat RED[4] = { 0.35f, 0.0f, 0.0f, 1.0f };
 const GLfloat BLACK[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 const GLfloat BEIGE[4] = { 0.3f, 0.3f, 0.1f, 1.0f };
-const GLfloat BUTTON_1_COLOR[4] = { 0.6f, 0.6f, 0.3f, 1.0f };
-const GLfloat BUTTON_2_COLOR[4] = { 0.6f, 0.6f, 0.3f, 1.0f };
+const GLfloat BUTTON_1[4] = { 0.35f, 0.0f, 0.0f, 1.0f };
+const GLfloat BUTTON_2[4] = { 0.3f, 0.3f, 0.3f, 1.0f };
 
 // Camera and positioning
 GLfloat ratio = 1.0f;
@@ -67,7 +68,7 @@ int lastHitCount = 0;
 std::stack<piece> pieceStack;
 
 //The game core
-//CheckersCore GameCore;
+ //CheckersCore GameCore;
 
 /**
  * Resets the black/white color pattern for all the board tile
@@ -88,9 +89,9 @@ void initButtonsColors() {
 	for (int col = 0; col < 2; col++) {
 		for (int lin = 0; lin < 1; lin++) {
 			if ((col + lin) % 2 == 0) {
-				memcpy(buttonsColor[col][lin], BUTTON_1_COLOR, 4 * sizeof(GLfloat));
+				memcpy(buttonsColor[col][lin], WHITE, 4 * sizeof(GLfloat));
 			} else {
-				memcpy(buttonsColor[col][lin], BUTTON_2_COLOR, 4 * sizeof(GLfloat));
+				memcpy(buttonsColor[col][lin], WHITE, 4 * sizeof(GLfloat));
 			}
 		}
 	}
@@ -203,19 +204,6 @@ void drawMenuButtons(GLenum mode) {
 		glVertex3f(x, y + boardTileHeight, 0.0f);
 	}
 	glEnd();
-
-	glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
-	glColor4fv(BLACK);
-	glRasterPos3d(x + 5.5, y - 4, 0.1);
-	glBitmap(GLYPH_WIDTH, GLYPH_HEIGHT, 0, 0, GLYPH_WIDTH, 0, (GLubyte*)glyphs['N']);
-	glBitmap(GLYPH_WIDTH, GLYPH_HEIGHT, 0, 0, GLYPH_WIDTH, 0, (GLubyte*)glyphs['e']);
-	glBitmap(GLYPH_WIDTH, GLYPH_HEIGHT, 0, 0, GLYPH_WIDTH, 0, (GLubyte*)glyphs['w']);
-	glBitmap(GLYPH_WIDTH, GLYPH_HEIGHT, 0, 0, GLYPH_WIDTH, 0, (GLubyte*)glyphs[' ']);
-	glBitmap(GLYPH_WIDTH, GLYPH_HEIGHT, 0, 0, GLYPH_WIDTH, 0, (GLubyte*)glyphs['G']);
-	glBitmap(GLYPH_WIDTH, GLYPH_HEIGHT, 0, 0, GLYPH_WIDTH, 0, (GLubyte*)glyphs['a']);
-	glBitmap(GLYPH_WIDTH, GLYPH_HEIGHT, 0, 0, GLYPH_WIDTH, 0, (GLubyte*)glyphs['m']);
-	glBitmap(GLYPH_WIDTH, GLYPH_HEIGHT, 0, 0, GLYPH_WIDTH, 0, (GLubyte*)glyphs['e']);
-
 	if (mode == GL_SELECT) {
 		glPopName();
 	}
@@ -235,15 +223,6 @@ void drawMenuButtons(GLenum mode) {
 		glVertex3f(x, y + boardTileHeight, 0.0f);
 	}
 	glEnd();
-
-	glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
-	glColor4fv(BLACK);
-	glRasterPos3d(x + 5.5, y - 4, 0.1);
-	glBitmap(GLYPH_WIDTH, GLYPH_HEIGHT, 0, 0, GLYPH_WIDTH, 0, (GLubyte*)glyphs['E']);
-	glBitmap(GLYPH_WIDTH, GLYPH_HEIGHT, 0, 0, GLYPH_WIDTH, 0, (GLubyte*)glyphs['x']);
-	glBitmap(GLYPH_WIDTH, GLYPH_HEIGHT, 0, 0, GLYPH_WIDTH, 0, (GLubyte*)glyphs['i']);
-	glBitmap(GLYPH_WIDTH, GLYPH_HEIGHT, 0, 0, GLYPH_WIDTH, 0, (GLubyte*)glyphs['t']);
-
 	if (mode == GL_SELECT) {
 		glPopName();
 	}
