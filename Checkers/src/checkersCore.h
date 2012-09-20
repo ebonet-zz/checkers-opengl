@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <list>
+#include <queue>
 #include "piece.h"
 #include "coordinate.h"
 #include "gameGrid.h"
@@ -38,7 +38,7 @@ public:
 
 	void updateBoardState(int[8][8]);
 
-	std::list<piece> getPieces();
+	std::queue<piece> getPieces();
 
 	int isGameWon(void);
 
@@ -46,13 +46,15 @@ public:
 
 	int getCurrentPlayer();
 
+	bool isTileSelectable(Coordinate);
+
 private:
 
 	int average(int, int);
 
 	void initializeGame();
 
-	std::list<piece> updatePawnsOnBoard();
+	std::queue<piece> updatePawnsOnBoard();
 
 	/**
 	 * The current state of the game
@@ -62,7 +64,7 @@ private:
 	/**
 	 * The list of pawns that are still on board
 	 */
-	std::list<piece> PawnsOnBoard;
+	std::queue<piece> PawnsOnBoard;
 
 	/**
 	 * The player that is currently playing (0 for red, 1 for brown)

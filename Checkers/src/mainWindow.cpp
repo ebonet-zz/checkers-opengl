@@ -1,8 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <SFML/Window.hpp>
-#include <stack>
-#include <list>
+#include <queue>
 #include "checkersCore.h"
 #include "glyphs.h"
 using namespace std;
@@ -66,7 +65,7 @@ int lastSelectedCoordinates[2];
 int lastHitCount = 0;
 
 // Piece stack from the core
-std::list<piece> pieceList;
+std::queue<piece> pieceList;
 
 //The game core
 CheckersCore GameCore;
@@ -171,6 +170,10 @@ void drawBoard(GLenum mode) {
  * Param piece - The piece to draw
  */
 void drawPiece(piece p) {
+
+	/**
+	 * TODO: Fix the array indexing conflict
+	 */
 	glPushMatrix();
 
 	if (p.pieceType == 'r' || p.pieceType == 'R') {
@@ -270,9 +273,19 @@ void display(void) {
 
 	drawBoard(GL_RENDER);
 
+	unsigned int i=0;
+
+	while(i<pieceList.size()){
+		Piece somePiece = pieceList.front();
+		drawPiece(somePiece);
+		pieceList.pop();
+		pieceList.push(somePiece);
+		i++;
+	}
+	/*
 	for (list<piece>::iterator it = pieceList.begin(); it != pieceList.end(); it++){
 		drawPiece(*it);
-	}
+	}*/
 
 //	piece p(3, 3, 'r');
 //	piece p2(1, 1, 'b');
@@ -432,8 +445,12 @@ public:
 					initButtonsColors();
 					handleClick(Event.MouseButton.X, Event.MouseButton.Y);
 					if (lastHitCount != 0) {
+
 						if (wasBoardHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
-							lightBoardTile(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
+							if(GameCore.isTileSelectable(Coordinate(lastSelectedCoordinates))){
+
+								lightBoardTile(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
+							}
 						}
 						if (wasButtonHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
 							lightButton(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);

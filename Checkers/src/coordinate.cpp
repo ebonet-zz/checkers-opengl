@@ -17,6 +17,11 @@ coordinate::coordinate() {
 	this->row = -1;
 }
 
+coordinate::coordinate(int tile[]){
+	this->column=tile[1];
+	this->row = tile[0];
+}
+
 int coordinate::rowDistance(Coordinate anotherCoordinate) {
 	return abs(this->row - anotherCoordinate.row);
 }

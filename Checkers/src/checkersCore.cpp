@@ -21,8 +21,8 @@ CheckersCore::CheckersCore() {
 	PlayerInTurn = 0;
 	nPiecesOnBoard[0] = nPiecesOnBoard[1] = 0;
 
-	CurrentGameState.createGridFromFile("TestGameGrid.txt");
-	//CurrentGameState.createInitialGrid();
+	//CurrentGameState.createGridFromFile("TestGameGrid.txt");
+	CurrentGameState.createInitialGrid();
 	PawnsOnBoard = this->updatePawnsOnBoard();
 }
 
@@ -36,7 +36,7 @@ void CheckersCore::initializeGame() {
 	PlayerInTurn = 0;
 	nPiecesOnBoard[0] = nPiecesOnBoard[1] = 0;
 	CurrentGameState.createInitialGrid();
-	PawnsOnBoard = this->updatePawnsOnBoard();
+	PawnsOnBoard = updatePawnsOnBoard();
 }
 
 /**
@@ -98,7 +98,7 @@ bool CheckersCore::makeMove(Coordinate oldCoordinate,
 /**
  * Returns a stack containing the pawns that are currently on board
  */
-std::list<piece> CheckersCore::getPieces() {
+std::queue<piece> CheckersCore::getPieces() {
 	return this->PawnsOnBoard;
 }
 
@@ -108,15 +108,15 @@ std::list<piece> CheckersCore::getPieces() {
  * updates the list of pawns that are still in the board
  *
  */
-std::list<piece> CheckersCore::updatePawnsOnBoard() {
-	std::list<piece> newPawns;
+std::queue<piece> CheckersCore::updatePawnsOnBoard() {
+	std::queue<piece> newPawns;
 
 	int row, column;
 
 	for (row = 0; row < 8; row++) {
 		for (column = 0; column < 8; column++) {
 			if (CurrentGameState.isPiece(Coordinate(row, column))) {
-				newPawns.push_front(piece(row, column,CurrentGameState.getCellAt(Coordinate(row, column))));
+				newPawns.push(piece(row, column,CurrentGameState.getCellAt(Coordinate(row, column))));
 			}
 		}
 	}
@@ -201,3 +201,6 @@ bool CheckersCore::isThisMoveValid(Coordinate oldCoordinate,
 	return false;
 }
 
+bool CheckersCore::isTileSelectable(Coordinate A){
+	return (PlayerInTurn && (CurrentGameState.getCellAt(A)=='b')) || (!PlayerInTurn && (CurrentGameState.getCellAt(A)=='r'));
+}
