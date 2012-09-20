@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stack>
-#include "Coordinate.cpp"
+#include "coordinate.cpp"
 #include <cmath>
 #include "piece.cpp"
 
@@ -340,23 +340,23 @@ void printMatrix(int theMatrix[8][8]){
 }
 
 
-int main()
-{
-	CheckersCore checkers;
-
-	cout << checkers.isThisMoveValid(Coordinate(5,0),Coordinate(4,1)) << endl;
-	cout << checkers.isThisMoveValid(Coordinate(5,0),Coordinate(4,0)) << endl;
-	cout << checkers.isThisMoveValid(Coordinate(2,3),Coordinate(4,1)) << endl;
-
-
-	checkers.makeMove(Coordinate(2,3), Coordinate(4,1));
-
-	checkers.makeMove(Coordinate(5,4), Coordinate(4,5));
-
-	checkers.makeMove(Coordinate(5,2), Coordinate(3,0));
-
-    return 0;
-}
+//int main()
+//{
+//	CheckersCore checkers;
+//
+//	cout << checkers.isThisMoveValid(Coordinate(5,0),Coordinate(4,1)) << endl;
+//	cout << checkers.isThisMoveValid(Coordinate(5,0),Coordinate(4,0)) << endl;
+//	cout << checkers.isThisMoveValid(Coordinate(2,3),Coordinate(4,1)) << endl;
+//
+//
+//	checkers.makeMove(Coordinate(2,3), Coordinate(4,1));
+//
+//	checkers.makeMove(Coordinate(5,4), Coordinate(4,5));
+//
+//	checkers.makeMove(Coordinate(5,2), Coordinate(3,0));
+//
+//    return 0;
+//}
 
 
 
