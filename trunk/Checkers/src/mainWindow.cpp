@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include <SFML/Window.hpp>
 #include <stack>
+#include <list>
 #include "checkersCore.h"
 #include "glyphs.h"
+using namespace std;
 
 // Defines and constants
 #define ROUND_PRECISION 50
@@ -64,10 +66,10 @@ int lastSelectedCoordinates[2];
 int lastHitCount = 0;
 
 // Piece stack from the core
-std::stack<piece> pieceStack;
+std::list<piece> pieceList;
 
 //The game core
-//CheckersCore GameCore;
+CheckersCore GameCore;
 
 /**
  * Resets the black/white color pattern for all the board tile
@@ -126,6 +128,7 @@ void init() {
 
 	initBoardColors();
 	initButtonsColors();
+	pieceList = GameCore.getPieces();
 }
 
 /**
@@ -267,11 +270,14 @@ void display(void) {
 
 	drawBoard(GL_RENDER);
 
-	//TODO: This is a Test
-	piece p(3, 3, 'r');
-	piece p2(1, 1, 'b');
-	drawPiece(p);
-	drawPiece(p2);
+	for (list<piece>::iterator it = pieceList.begin(); it != pieceList.end(); it++){
+		drawPiece(*it);
+	}
+
+//	piece p(3, 3, 'r');
+//	piece p2(1, 1, 'b');
+//	drawPiece(p);
+//	drawPiece(p2);
 
 	drawMenuButtons(GL_RENDER);
 
