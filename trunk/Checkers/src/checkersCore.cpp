@@ -98,7 +98,7 @@ bool CheckersCore::makeMove(Coordinate oldCoordinate,
 /**
  * Returns a stack containing the pawns that are currently on board
  */
-std::stack<piece> CheckersCore::getPieces() {
+std::list<piece> CheckersCore::getPieces() {
 	return this->PawnsOnBoard;
 }
 
@@ -108,18 +108,15 @@ std::stack<piece> CheckersCore::getPieces() {
  * updates the list of pawns that are still in the board
  *
  */
-std::stack<piece> CheckersCore::updatePawnsOnBoard() {
-	std::stack<piece> newPawns;
+std::list<piece> CheckersCore::updatePawnsOnBoard() {
+	std::list<piece> newPawns;
 
 	int row, column;
 
 	for (row = 0; row < 8; row++) {
 		for (column = 0; column < 8; column++) {
 			if (CurrentGameState.isPiece(Coordinate(row, column))) {
-				newPawns.push(
-						Piece(row, column,
-								CurrentGameState.getCellAt(
-										Coordinate(row, column))));
+				newPawns.push_front(piece(row, column,CurrentGameState.getCellAt(Coordinate(row, column))));
 			}
 		}
 	}

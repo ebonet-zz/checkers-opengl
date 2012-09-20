@@ -11,7 +11,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include <stack>
+#include <list>
 #include "piece.h"
 #include "coordinate.h"
 #include "gameGrid.h"
@@ -38,7 +38,7 @@ public:
 
 	void updateBoardState(int[8][8]);
 
-	std::stack<piece> getPieces();
+	std::list<piece> getPieces();
 
 	int isGameWon(void);
 
@@ -52,7 +52,7 @@ private:
 
 	void initializeGame();
 
-	std::stack<piece> updatePawnsOnBoard();
+	std::list<piece> updatePawnsOnBoard();
 
 	/**
 	 * The current state of the game
@@ -62,7 +62,7 @@ private:
 	/**
 	 * The list of pawns that are still on board
 	 */
-	std::stack<piece> PawnsOnBoard;
+	std::list<piece> PawnsOnBoard;
 
 	/**
 	 * The player that is currently playing (0 for red, 1 for brown)
