@@ -383,7 +383,7 @@ void setWindowSize(unsigned int w, unsigned int h) {
 void processHits(GLint hits, GLuint buffer[]) {
 	GLuint names, *bufferIntegerPointer;
 
-	printf("hits = %d\n", hits);
+	cout << "hits = " << hits << endl;
 	lastHitCount = hits;
 	bufferIntegerPointer = (GLuint *) buffer;
 	for (int i = 0; i < hits; i++) { /*  for each hit  */
@@ -510,7 +510,8 @@ public:
 					if (lastHitCount != 0) {
 
 						if (wasBoardHit(7-lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
-							if(GameCore.isTileSelectable(Coordinate(lastSelectedCoordinates))){
+							cout << 7-lastSelectedCoordinates[0] << ", " << lastSelectedCoordinates[1] << endl;
+							if(GameCore.isTileSelectable(Coordinate(7-lastSelectedCoordinates[0],lastSelectedCoordinates[1]))){
 
 								lightBoardTile(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
 							}
