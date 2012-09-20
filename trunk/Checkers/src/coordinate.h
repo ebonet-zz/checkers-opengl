@@ -20,6 +20,8 @@ struct coordinate {
 
 	coordinate();
 
+	coordinate(int []);
+
 	int rowDistance(Coordinate);
 
 	int columnDistance(Coordinate);
