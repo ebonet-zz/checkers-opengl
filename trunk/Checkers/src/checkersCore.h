@@ -12,6 +12,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <queue>
+#include <list>
 #include "piece.h"
 #include "coordinate.h"
 #include "gameGrid.h"
@@ -33,6 +34,14 @@ public:
 	bool makeMove(Coordinate, Coordinate);
 
 	bool isThisMoveValid(Coordinate, Coordinate);
+
+	bool isImmediateMove(Coordinate, Coordinate);
+
+	bool isEatingMove(Coordinate, Coordinate);
+
+	bool isChainEatingMove(Coordinate, Coordinate);
+
+	std::list<Coordinate> getPossibleMoves(Coordinate);
 
 	void updateBoardState(int[8][8], Coordinate);
 
