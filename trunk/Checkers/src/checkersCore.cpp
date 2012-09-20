@@ -65,7 +65,7 @@ private:
 		return (someNumber+anotherNumber)/2;
 	}
 
-	void initializeGame(); //TODO: Initialize this
+	void initializeGame();
 
 
 	std::stack<piece> updatePawnsOnBoard();

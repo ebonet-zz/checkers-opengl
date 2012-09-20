@@ -3,6 +3,7 @@
 #include <SFML/Window.hpp>
 #include <stack>
 #include "piece.cpp"
+#include "checkersCore.cpp"
 
 // Defines and constants
 #define ROUND_PRECISION 50
@@ -63,6 +64,9 @@ int lastHitCount = 0;
 
 // Piece stack from the core
 std::stack<piece> pieceStack;
+
+//The game core
+ CheckersCore GameCore;
 
 /**
  * Resets the black/white color pattern for all the board tile
@@ -369,7 +373,6 @@ public:
 private:
 	sf::Window *App;
 };
-
 
 int main(int argc, char **argv) {
 	init();

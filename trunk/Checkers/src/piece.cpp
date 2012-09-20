@@ -1,5 +1,3 @@
-typedef struct piece Piece;
-
 struct piece {
         int line,column;
         char pieceType;
@@ -12,3 +10,5 @@ struct piece {
         }
 
 };
+
+typedef struct piece Piece;
