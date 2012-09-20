@@ -370,8 +370,10 @@ private:
 	sf::Window *App;
 };
 
+/**
 int main(int argc, char **argv) {
+>>>>>>> .r11
 	init();
 	GLBox prog;
 	return EXIT_SUCCESS;
-}
+}*/
