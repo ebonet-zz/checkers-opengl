@@ -10,7 +10,7 @@ using namespace std;
 #define ROUND_PRECISION 50
 #define CIRC 2 * M_PI
 #define DTHETA CIRC / ROUND_PRECISION
-#define WINDOW_SIZE 900
+#define WINDOW_SIZE 700
 #define NCOLS_BOARD 8
 #define NLINS_BOARD 8
 #define X0 -50.0f
@@ -77,9 +77,9 @@ void initBoardColors() {
 	for (int col = 0; col < 8; col++) {
 		for (int lin = 0; lin < 8; lin++) {
 			if ((col + lin) % 2 == 0) {
-				memcpy(boardColor[col][lin], WHITE, 4 * sizeof(GLfloat));
-			} else {
 				memcpy(boardColor[col][lin], BEIGE, 4 * sizeof(GLfloat));
+			} else {
+				memcpy(boardColor[col][lin], WHITE, 4 * sizeof(GLfloat));
 			}
 		}
 	}
@@ -137,6 +137,69 @@ void init() {
  * Param mode - The current OpenGl rendering mode.
  */
 void drawBoard(GLenum mode) {
+
+	/* Board Lower Face*/
+	glBegin(GL_POLYGON);
+	{
+		glNormal3f(0,0,-1);
+		glColor4fv(GREY);
+		glVertex3f(X0, Y0, -4.0f);
+		glVertex3f(X0, Y1, -4.0f);
+		glColor4fv(RED);
+		glVertex3f(X1, Y1, -4.0f);
+		glVertex3f(X1, Y0, -4.0f);
+
+
+	}glEnd();
+
+	/* Board Grey Face*/
+	glBegin(GL_POLYGON);
+	{
+		glColor4fv(GREY);
+
+		glNormal3f(0,-1,0);
+		glVertex3f(X0, Y1, -4.00f);
+		glVertex3f(X0, Y0, -4.00f);
+		glVertex3f(X0, Y0, 0.00f);
+		glVertex3f(X0, Y1, 0.00f);
+	}glEnd();
+
+	/* Board Red Face*/
+	glBegin(GL_POLYGON);
+	{
+		glColor4fv(RED);
+		glNormal3f(0,-1,0);
+		glVertex3f(X1, Y1, -4.00f);
+		glVertex3f(X1, Y0, -4.00f);
+		glVertex3f(X1, Y0, 0.00f);
+		glVertex3f(X1, Y1, 0.00f);
+	}glEnd();
+
+	/* Board Right Face*/
+	glBegin(GL_POLYGON);
+	{
+		glColor4fv(GREY);
+		glVertex3f(X0, Y1, 0.00f);
+		glVertex3f(X0, Y1, -4.00f);
+
+		glColor4fv(RED);
+		glVertex3f(X1, Y1, -4.00f);
+		glVertex3f(X1, Y1, 0.00f);
+	}glEnd();
+
+	glBegin(GL_POLYGON);
+	{
+		glColor4fv(GREY);
+		glVertex3f(X0, Y0, 0.00f);
+		glVertex3f(X0, Y0, -4.00f);
+
+		glColor4fv(RED);
+		glVertex3f(X1, Y0, -4.00f);
+		glVertex3f(X1, Y0, 0.00f);
+	}glEnd();
+
+	/* Board Left Face*/
+
 	for (int col = 0; col < 8; col++) {
 		GLfloat x = X0 + boardTileWidth * col;
 		if (mode == GL_SELECT) {
@@ -182,7 +245,7 @@ void drawPiece(piece p) {
 		glColor4fv(GREY);
 	}
 
-	glTranslatef(X0 + boardTileWidth * p.column, Y0 + boardTileHeight * p.line, 0.1);
+	glTranslatef(X0 + boardTileWidth *(7-p.line) , Y0 + boardTileHeight *(p.column), 0.1);
 	glTranslatef(boardTileWidth / 2, boardTileHeight / 2, 0);
 
 	gluDisk(gluNewQuadric(), 0, pieceWidth, ROUND_PRECISION, ROUND_PRECISION);
@@ -362,7 +425,7 @@ void handleClick(int x, int y) {
 	glLoadIdentity();
 
 	/*       create 5x5 pixel picking region near cursor location   */
-	gluPickMatrix((GLdouble) x, (GLdouble) (viewport[3] - y), 5.0, 5.0, viewport);
+	gluPickMatrix((GLdouble) x, (GLdouble) (viewport[3] - y), 2.0, 2.0, viewport);
 
 	gluPerspective(60, ratio, 0.5, 500.0);
 	drawBoard(GL_SELECT);
@@ -446,7 +509,7 @@ public:
 					handleClick(Event.MouseButton.X, Event.MouseButton.Y);
 					if (lastHitCount != 0) {
 
-						if (wasBoardHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
+						if (wasBoardHit(7-lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
 							if(GameCore.isTileSelectable(Coordinate(lastSelectedCoordinates))){
 
 								lightBoardTile(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
