@@ -9,7 +9,15 @@
 #include "coordinate.h"
 using namespace std;
 
+coordinate::coordinate(int row, int column){
+	this->row=row;
+	this->column = column;
+}
 
+coordinate::coordinate(){
+	this->column=-1;
+	this->row=-1;
+}
 
 int coordinate::rowDistance(Coordinate anotherCoordinate){
 	return abs(this->row-anotherCoordinate.row);
