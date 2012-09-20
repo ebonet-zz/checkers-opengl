@@ -18,7 +18,7 @@ void CheckersCore::restartGame() {
  * Creates the game
  */
 CheckersCore::CheckersCore() {
-	PlayerInTurn = 0;
+	PlayerInTurn = 1;
 	nPiecesOnBoard[0] = nPiecesOnBoard[1] = 0;
 
 	//CurrentGameState.createGridFromFile("TestGameGrid.txt");
@@ -27,13 +27,13 @@ CheckersCore::CheckersCore() {
 }
 
 CheckersCore::CheckersCore(char * fileName) {
-	PlayerInTurn = 0;
+	PlayerInTurn = 1;
 	nPiecesOnBoard[0] = nPiecesOnBoard[1] = 0;
 	CurrentGameState.createGridFromFile(fileName);
 }
 
 void CheckersCore::initializeGame() {
-	PlayerInTurn = 0;
+	PlayerInTurn = 1;
 	nPiecesOnBoard[0] = nPiecesOnBoard[1] = 0;
 	CurrentGameState.createInitialGrid();
 	PawnsOnBoard = updatePawnsOnBoard();
