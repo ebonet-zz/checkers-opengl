@@ -31,6 +31,8 @@ int coordinate::columnDistance(Coordinate anotherCoordinate) {
 }
 
 bool coordinate::isDiagonalNeighbor(Coordinate anotherCoordinate) {
-	return this->rowDistance(anotherCoordinate) == 1 && this->columnDistance(anotherCoordinate) == 1;
+	int r = this->rowDistance(anotherCoordinate);
+	int c = this->columnDistance(anotherCoordinate);
+	return r == 1 && c == 1;
 }
 

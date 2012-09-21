@@ -30,7 +30,8 @@ char GameGrid::getCellAt(int row, int column) {
 }
 
 bool GameGrid::isEmptyCell(Coordinate A) {
-	return getCellAt(A) == EMPTY_CELL;
+	bool r = getCellAt(A) == EMPTY_CELL;
+	return r;
 }
 
 bool GameGrid::isPiece(Coordinate A) {
