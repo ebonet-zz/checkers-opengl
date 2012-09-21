@@ -487,19 +487,15 @@ void highLightPossibleMoves(int lin, int col) {
 	}
 }
 
-void lightButton(int lin, int col, const GLfloat color[4]) {
+void performButtonAction(int lin, int col, const GLfloat color[4]) {
 	if (wasButtonHit(lin, col)) {
-		col = 0;
-
 		if (lin == BUTTON_1_NAME) {
 			GameCore.restartGame();
-			lin = 0;
+			initBoardColors();
+			pieceList = GameCore.getPieces();
 		} else {
 			quit = true;
-			lin = 1;
 		}
-
-		//memcpy(buttonsColor[lin][col], color, 4 * sizeof(GLfloat));
 	}
 }
 
@@ -614,7 +610,7 @@ public:
 				}
 			}
 			if (wasButtonHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
-				lightButton(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
+				performButtonAction(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
 				lastSelectedCoordinate = NO_SELECTION;
 
 
