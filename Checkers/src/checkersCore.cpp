@@ -181,10 +181,23 @@ std::list<Coordinate> CheckersCore::getPossibleMoves(Coordinate SelectedTile) {
 bool CheckersCore::isThisMoveValid(Coordinate oldCoordinate, Coordinate newCoordinate) {
 
 	if (isImmediateMove(oldCoordinate, newCoordinate)) {
+		cout << "Origin: " << oldCoordinate.row << "," << oldCoordinate.column << endl;
+		cout << "Target: " << newCoordinate.row << "," << newCoordinate.column << endl;
+		cout << "Valid immediate move: The target coordinate is empty" << endl;
+		return true;
+	}
+
+	if (isEatingMove(oldCoordinate, newCoordinate)) {
+		cout << "Origin: " << oldCoordinate.row << "," << oldCoordinate.column << endl;
+		cout << "Target: " << newCoordinate.row << "," << newCoordinate.column << endl;
+		cout << "Valid eating move: The target coordinate is empty" << endl;
 		return true;
 	}
 
 	if (isChainEatingMove(oldCoordinate, newCoordinate)) {
+		cout << "Origin: " << oldCoordinate.row << "," << oldCoordinate.column << endl;
+		cout << "Target: " << newCoordinate.row << "," << newCoordinate.column << endl;
+		cout << "Valid chain move: The target coordinate is empty" << endl;
 		return true;
 	}
 
@@ -196,10 +209,20 @@ bool CheckersCore::isChainEatingMove(Coordinate oldCoordinate, Coordinate newCoo
 		return true;
 	}
 
-	list<Coordinate> possibleMoves = getPossibleMoves(oldCoordinate);
+	list<Coordinate> possibleMoves;
+	int row, column;
+	for (row = 0; row < 8; row++) {
+		for (column = 0; column < 8; column++) {
+			Coordinate currentCoordinate(row, column);
+			if (isEatingMove(oldCoordinate, currentCoordinate)) {
+				possibleMoves.push_back(currentCoordinate);
+			}
+		}
+	}
+
 	for (list<Coordinate>::iterator it = possibleMoves.begin(); it != possibleMoves.end(); it++) {
-		if (isEatingMove(oldCoordinate, *it)) {
-			return isChainEatingMove(*it, newCoordinate);
+		if (isChainEatingMove(*it, newCoordinate)) {
+			return true;
 		}
 	}
 	return false;
@@ -211,17 +234,15 @@ bool CheckersCore::isEatingMove(Coordinate oldCoordinate, Coordinate newCoordina
 		return false;
 	}
 
-	cout << "Origin: " << oldCoordinate.row << "," << oldCoordinate.column << endl;
-	cout << "Target: " << newCoordinate.row << "," << newCoordinate.column << endl;
 	// if there's a piece the move is invalid
 	if (!CurrentGameState.isEmptyCell(newCoordinate)) {
-		cout << "Invalid move: The target coordinate is not empty" << endl;
+		//cout << "Invalid move: The target coordinate is not empty" << endl;
 		return false;
 	}
 
 	// The last valid movement happens when an enemy piece is being killed
 	if (abs(oldCoordinate.row - newCoordinate.row) == 2 && abs(oldCoordinate.row - newCoordinate.row) == 2) {
-		cout << "Testing if jumping is valid" << endl;
+		//cout << "Testing if jumping is valid" << endl;
 		Coordinate midPoint;
 
 		midPoint.row = average(oldCoordinate.row, newCoordinate.row);
@@ -239,17 +260,15 @@ bool CheckersCore::isImmediateMove(Coordinate oldCoordinate, Coordinate newCoord
 		return false;
 	}
 
-	cout << "Origin: " << oldCoordinate.row << "," << oldCoordinate.column << endl;
-	cout << "Target: " << newCoordinate.row << "," << newCoordinate.column << endl;
 	// if there's a piece the move is invalid
 	if (!CurrentGameState.isEmptyCell(newCoordinate)) {
-		cout << "Invalid move: The target coordinate is not empty" << endl;
+		//cout << "Invalid move: The target coordinate is not empty" << endl;
 		return false;
 	}
 
 	// if the coordinate is a neighbor empty space the move is valid
 	if (oldCoordinate.isDiagonalNeighbor(newCoordinate)) {
-		cout << "Valid move: The target coordinate is empty" << endl;
+		//cout << "Valid move: The target coordinate is empty" << endl;
 		return true;
 	}
 
