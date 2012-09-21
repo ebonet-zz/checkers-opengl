@@ -39,8 +39,6 @@ public:
 
 	bool isEatingMove(Coordinate, Coordinate);
 
-	bool isChainEatingMove(Coordinate, Coordinate);
-
 	std::list<Coordinate> getPossibleMoves(Coordinate);
 
 	void updateBoardState(int[8][8], Coordinate);
