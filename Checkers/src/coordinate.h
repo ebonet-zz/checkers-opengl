@@ -28,6 +28,9 @@ struct coordinate {
 
 	bool isDiagonalNeighbor(Coordinate);
 
+	bool operator==(const Coordinate &other) const;
+
+	bool operator!=(const Coordinate &other) const;
 };
 
 #endif /* COORDINATE_H_ */
