@@ -78,9 +78,9 @@ void initBoardColors() {
 	for (int col = 0; col < 8; col++) {
 		for (int lin = 0; lin < 8; lin++) {
 			if ((col + lin) % 2 == 0) {
-				memcpy(boardColor[col][lin], WHITE, 4 * sizeof(GLfloat));
+				memcpy(boardColor[lin][col], WHITE, 4 * sizeof(GLfloat));
 			} else {
-				memcpy(boardColor[col][lin], BEIGE, 4 * sizeof(GLfloat));
+				memcpy(boardColor[lin][col], BEIGE, 4 * sizeof(GLfloat));
 			}
 		}
 	}
@@ -90,9 +90,9 @@ void initButtonsColors() {
 	for (int col = 0; col < 2; col++) {
 		for (int lin = 0; lin < 1; lin++) {
 			if ((col + lin) % 2 == 0) {
-				memcpy(buttonsColor[col][lin], BUTTON_1_COLOR, 4 * sizeof(GLfloat));
+				memcpy(buttonsColor[lin][col], BUTTON_1_COLOR, 4 * sizeof(GLfloat));
 			} else {
-				memcpy(buttonsColor[col][lin], BUTTON_2_COLOR, 4 * sizeof(GLfloat));
+				memcpy(buttonsColor[lin][col], BUTTON_2_COLOR, 4 * sizeof(GLfloat));
 			}
 		}
 	}
@@ -207,19 +207,19 @@ void drawBoardBorders() {
  */
 void drawBoard(GLenum mode) {
 
-	for (int col = 0; col < 8; col++) {
-		GLfloat x = X0 + boardTileWidth * col;
+	for (int lin = 0; lin < 8; lin++) {
+		GLfloat x = X0 + boardTileWidth * lin;
 		if (mode == GL_SELECT) {
-			glLoadName(7 - col);
+			glLoadName(7 - lin);
 		}
-		for (int lin = 0; lin < 8; lin++) {
-			GLfloat y = Y0 + boardTileHeight * lin;
+		for (int col = 0; col < 8; col++) {
+			GLfloat y = Y0 + boardTileHeight * col;
 			if (mode == GL_SELECT) {
-				glPushName(lin);
+				glPushName(col);
 			}
 			glBegin(GL_POLYGON);
 			{
-				glColor4fv(boardColor[7 - col][lin]);
+				glColor4fv(boardColor[7 - lin][col]);
 				glNormal3f(0, 0, -1);
 				glVertex3f(x, y, 0.0f);
 				glVertex3f(x + boardTileWidth, y, 0.0f);
@@ -447,32 +447,32 @@ void handleClick(int x, int y) {
 	processHits(hits, selectBuf);
 }
 
-bool wasBoardHit(int col, int lin) {
+bool wasBoardHit(int lin, int col) {
 	return col >= 0 && col <= 7 && lin >= 0 && lin <= 7;
 }
 
-bool wasButtonHit(int col, int lin) {
+bool wasButtonHit(int lin, int col) {
 	return col >= BUTTON_1_NAME && col <= BUTTON_2_NAME && lin >= 0 && lin <= 2;
 }
 
 /**
  * Lights up one of the board tiles to the desired new color
  */
-void lightBoardTile(int col, int lin, const GLfloat color[4]) {
-	if (wasBoardHit(col, lin)) {
-		memcpy(boardColor[col][lin], color, 4 * sizeof(GLfloat));
+void lightBoardTile(int lin, int col, const GLfloat color[4]) {
+	if (wasBoardHit(lin, col)) {
+		memcpy(boardColor[lin][col], color, 4 * sizeof(GLfloat));
 	}
 }
 
-void highLightPossibleMoves(int col, int lin) {
+void highLightPossibleMoves(int lin, int col) {
 	std::list<Coordinate> possibleMoves = GameCore.getPossibleMoves(Coordinate(lin, col));
 	for (list<Coordinate>::iterator it = possibleMoves.begin(); it != possibleMoves.end(); it++) {
-		lightBoardTile(it->column, it->row, BLUE);
+		lightBoardTile(it->row, it->column, LIGHT_GREEN);
 	}
 }
 
-void lightButton(int col, int lin, const GLfloat color[4]) {
-	if (wasButtonHit(col, lin)) {
+void lightButton(int lin, int col, const GLfloat color[4]) {
+	if (wasButtonHit(lin, col)) {
 		lin = 0;
 
 		if (col == BUTTON_1_NAME) {
@@ -481,18 +481,18 @@ void lightButton(int col, int lin, const GLfloat color[4]) {
 			col = 1;
 		}
 
-		memcpy(buttonsColor[col][lin], color, 4 * sizeof(GLfloat));
+		memcpy(buttonsColor[lin][col], color, 4 * sizeof(GLfloat));
 	}
 }
 
 /**
  * Brings the board tile to its default color.
  */
-void restoreBoardTile(int col, int lin) {
+void restoreBoardTile(int lin, int col) {
 	if ((col + lin) % 2 == 0) {
-		memcpy(boardColor[col][lin], WHITE, 4 * sizeof(GLfloat));
+		memcpy(boardColor[lin][col], WHITE, 4 * sizeof(GLfloat));
 	} else {
-		memcpy(boardColor[col][lin], GREY, 4 * sizeof(GLfloat));
+		memcpy(boardColor[lin][col], GREY, 4 * sizeof(GLfloat));
 	}
 }
 
@@ -527,7 +527,7 @@ public:
 							if (GameCore.isTileSelectable(
 									Coordinate(lastSelectedCoordinates[0], lastSelectedCoordinates[1]))) {
 
-								lightBoardTile(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
+								lightBoardTile(lastSelectedCoordinates[0], lastSelectedCoordinates[1], BLUE);
 								highLightPossibleMoves(lastSelectedCoordinates[0], lastSelectedCoordinates[1]);
 							} else {
 								initBoardColors();
@@ -584,6 +584,7 @@ private:
 
 int main(int argc, char **argv) {
 	init();
+
 	GLBox prog;
 	return EXIT_SUCCESS;
 }
