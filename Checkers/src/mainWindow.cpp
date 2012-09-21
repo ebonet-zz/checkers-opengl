@@ -613,7 +613,7 @@ public:
 
 						for(int row=0;row<8;row++){
 							for(int col =0; col<8;col++){
-								lightBoardTile(row, col, (GameCore.isGameWon())? RED: BEIGE);
+								lightBoardTile(row, col, (GameCore.isGameWon()==1)? RED: GREY);
 
 							}
 						}
