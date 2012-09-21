@@ -61,8 +61,8 @@ void GameGrid::removePieceAt(Coordinate A) {
 	GameGridMatrix[A.row][A.column] = EMPTY_CELL;
 }
 
-bool GameGrid::isEnemyPiece(Coordinate A, Coordinate B) {
-	return (getCellAt(A) == 'r' && getCellAt(B) == 'b') || (getCellAt(A) == 'b' && getCellAt(B) == 'r');
+bool GameGrid::isEnemyPiece(int currentPlayer, Coordinate B) {
+	return (!currentPlayer && getCellAt(B) == 'b') || (currentPlayer && getCellAt(B) == 'r');
 }
 
 void GameGrid::createGridFromFile(char * s) {

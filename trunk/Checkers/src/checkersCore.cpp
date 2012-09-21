@@ -70,6 +70,11 @@ bool CheckersCore::makeMove(Coordinate oldCoordinate, Coordinate newCoordinate) 
 	if (!isThisMoveValid(oldCoordinate, newCoordinate))
 		return false;
 
+	bool ate = false;
+	if (isEatingMove(oldCoordinate, newCoordinate)) {
+		ate = true;
+	}
+
 	// moves the piece
 	CurrentGameState.movePiece(oldCoordinate, newCoordinate);
 
@@ -85,8 +90,24 @@ bool CheckersCore::makeMove(Coordinate oldCoordinate, Coordinate newCoordinate) 
 		nPiecesOnBoard[!this->PlayerInTurn] -= 1;
 	}
 
-	// gives the turn to the next player
-	this->PlayerInTurn = !PlayerInTurn;
+	list<Coordinate> possibleMoves;
+
+	if (ate) {
+		int row, column;
+		for (row = 0; row < 8; row++) {
+			for (column = 0; column < 8; column++) {
+				Coordinate currentCoordinate(row, column);
+				if (isEatingMove(newCoordinate, currentCoordinate)) { // All first level eating moves
+					possibleMoves.push_back(currentCoordinate);
+				}
+			}
+		}
+	}
+
+	if (possibleMoves.empty()) {
+		// gives the turn to the next player
+		this->PlayerInTurn = !PlayerInTurn;
+	}
 
 	PawnsOnBoard = updatePawnsOnBoard();
 
@@ -194,37 +215,6 @@ bool CheckersCore::isThisMoveValid(Coordinate oldCoordinate, Coordinate newCoord
 		return true;
 	}
 
-	if (isChainEatingMove(oldCoordinate, newCoordinate)) {
-		cout << "Origin: " << oldCoordinate.row << "," << oldCoordinate.column << endl;
-		cout << "Target: " << newCoordinate.row << "," << newCoordinate.column << endl;
-		cout << "Valid chain move: The target coordinate is empty" << endl;
-		return true;
-	}
-
-	return false;
-}
-
-bool CheckersCore::isChainEatingMove(Coordinate oldCoordinate, Coordinate newCoordinate) {
-	if (isEatingMove(oldCoordinate, newCoordinate)) {
-		return true;
-	}
-
-	list<Coordinate> possibleMoves;
-	int row, column;
-	for (row = 0; row < 8; row++) {
-		for (column = 0; column < 8; column++) {
-			Coordinate currentCoordinate(row, column);
-			if (isEatingMove(oldCoordinate, currentCoordinate)) {
-				possibleMoves.push_back(currentCoordinate);
-			}
-		}
-	}
-
-	for (list<Coordinate>::iterator it = possibleMoves.begin(); it != possibleMoves.end(); it++) {
-		if (isChainEatingMove(*it, newCoordinate)) {
-			return true;
-		}
-	}
 	return false;
 }
 
@@ -248,7 +238,7 @@ bool CheckersCore::isEatingMove(Coordinate oldCoordinate, Coordinate newCoordina
 		midPoint.row = average(oldCoordinate.row, newCoordinate.row);
 		midPoint.column = average(oldCoordinate.column, newCoordinate.column);
 
-		return CurrentGameState.isEnemyPiece(oldCoordinate, midPoint);
+		return CurrentGameState.isEnemyPiece(getCurrentPlayer(), midPoint);
 	}
 
 	return false;

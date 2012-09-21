@@ -28,7 +28,7 @@ struct GameGrid {
 
 	void removePieceAt(Coordinate);
 
-	bool isEnemyPiece(Coordinate, Coordinate);
+	bool isEnemyPiece(int, Coordinate);
 
 	void createGridFromFile(char *);
 

@@ -587,9 +587,15 @@ public:
 			if (wasBoardHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
 				Coordinate newSelected(lastSelectedCoordinates[0], lastSelectedCoordinates[1]);
 				if (GameCore.isTileSelectable(newSelected)) {
-					lastSelectedCoordinate = newSelected;
-					lightBoardTile(lastSelectedCoordinates[0], lastSelectedCoordinates[1], BLUE);
-					highLightPossibleMoves(lastSelectedCoordinates[0], lastSelectedCoordinates[1]);
+					if (lastSelectedCoordinate != newSelected) {
+						lastSelectedCoordinate = newSelected;
+						lightBoardTile(lastSelectedCoordinates[0], lastSelectedCoordinates[1], BLUE);
+						highLightPossibleMoves(lastSelectedCoordinates[0], lastSelectedCoordinates[1]);
+					} else {
+						lastSelectedCoordinate = NO_SELECTION;
+						initBoardColors();
+						initButtonsColors();
+					}
 				} else if (wasMoveHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
 					movePiece(lastSelectedCoordinate, newSelected);
 					lastSelectedCoordinate = NO_SELECTION;
