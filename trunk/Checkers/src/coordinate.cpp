@@ -17,8 +17,8 @@ coordinate::coordinate() {
 	this->row = -1;
 }
 
-coordinate::coordinate(int tile[]){
-	this->column=tile[1];
+coordinate::coordinate(int tile[]) {
+	this->column = tile[1];
 	this->row = tile[0];
 }
 
@@ -34,5 +34,13 @@ bool coordinate::isDiagonalNeighbor(Coordinate anotherCoordinate) {
 	int r = this->rowDistance(anotherCoordinate);
 	int c = this->columnDistance(anotherCoordinate);
 	return r == 1 && c == 1;
+}
+
+bool coordinate::operator==(const Coordinate &other) const {
+	return other.column == this->column && other.row == this->row;
+}
+
+bool coordinate::operator!=(const Coordinate &other) const {
+	return !(*this == other);
 }
 

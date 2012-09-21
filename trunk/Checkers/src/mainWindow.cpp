@@ -67,6 +67,8 @@ int lastHitCount = 0;
 
 // Piece stack from the core
 std::queue<piece> pieceList;
+Coordinate lastSelectedCoordinate;
+Coordinate NO_SELECTION(-1, -1);
 
 //The game core
 CheckersCore GameCore;
@@ -415,7 +417,7 @@ void processHits(GLint hits, GLuint buffer[]) {
 /**
  * Translates the mouse click coordinates into an element selection using OpenGl GL_SELECT render mode.
  */
-void handleClick(int x, int y) {
+void captureClick(int x, int y) {
 	GLint viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
 
@@ -452,7 +454,21 @@ bool wasBoardHit(int lin, int col) {
 }
 
 bool wasButtonHit(int lin, int col) {
-	return col >= BUTTON_1_NAME && col <= BUTTON_2_NAME && lin >= 0 && lin <= 2;
+	return lin >= BUTTON_1_NAME && lin <= BUTTON_2_NAME && col >= 1 && col <= 2;
+}
+
+bool wasMoveHit(int lin, int col) {
+	if (lastSelectedCoordinate == NO_SELECTION)
+		return false;
+
+	std::list<Coordinate> possibleMoves = GameCore.getPossibleMoves(lastSelectedCoordinate);
+	for (list<Coordinate>::iterator it = possibleMoves.begin(); it != possibleMoves.end(); it++) {
+		if (it->row == lin && it->column == col) {
+			return true;
+		}
+	}
+
+	return false;
 }
 
 /**
@@ -473,16 +489,21 @@ void highLightPossibleMoves(int lin, int col) {
 
 void lightButton(int lin, int col, const GLfloat color[4]) {
 	if (wasButtonHit(lin, col)) {
-		lin = 0;
+		col = 0;
 
-		if (col == BUTTON_1_NAME) {
-			col = 0;
+		if (lin == BUTTON_1_NAME) {
+			lin = 0;
 		} else {
-			col = 1;
+			lin = 1;
 		}
 
 		memcpy(buttonsColor[lin][col], color, 4 * sizeof(GLfloat));
 	}
+}
+
+void movePiece(Coordinate o, Coordinate n) {
+	GameCore.makeMove(o, n);
+	pieceList = GameCore.getPieces();
 }
 
 /**
@@ -518,29 +539,8 @@ public:
 
 				if (Event.Type == sf::Event::MouseButtonPressed) {
 
-					//TODO: This is a Test
-					initBoardColors();
-					initButtonsColors();
-					handleClick(Event.MouseButton.X, Event.MouseButton.Y);
-					if (lastHitCount != 0) {
-						if (wasBoardHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
-							if (GameCore.isTileSelectable(
-									Coordinate(lastSelectedCoordinates[0], lastSelectedCoordinates[1]))) {
-
-								lightBoardTile(lastSelectedCoordinates[0], lastSelectedCoordinates[1], BLUE);
-								highLightPossibleMoves(lastSelectedCoordinates[0], lastSelectedCoordinates[1]);
-							} else {
-								initBoardColors();
-								initButtonsColors();
-							}
-						}
-						if (wasButtonHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
-							lightButton(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
-						}
-					} else {
-						initBoardColors();
-						initButtonsColors();
-					}
+					captureClick(Event.MouseButton.X, Event.MouseButton.Y);
+					handleClick();
 				}
 
 				if ((Event.Type == sf::Event::KeyPressed) && (Event.Key.Code == sf::Key::Right)) {
@@ -578,6 +578,33 @@ public:
 		upDownRotationAngle += rotationSpeed * direction;
 	}
 
+	void handleClick() {
+		// resets
+		initBoardColors();
+		initButtonsColors();
+
+		if (lastHitCount != 0) {
+			if (wasBoardHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
+				Coordinate newSelected(lastSelectedCoordinates[0], lastSelectedCoordinates[1]);
+				if (GameCore.isTileSelectable(newSelected)) {
+					lastSelectedCoordinate = newSelected;
+					lightBoardTile(lastSelectedCoordinates[0], lastSelectedCoordinates[1], BLUE);
+					highLightPossibleMoves(lastSelectedCoordinates[0], lastSelectedCoordinates[1]);
+				} else if (wasMoveHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
+					movePiece(lastSelectedCoordinate, newSelected);
+					lastSelectedCoordinate = NO_SELECTION;
+				} else {
+					lastSelectedCoordinate = NO_SELECTION;
+					initBoardColors();
+					initButtonsColors();
+				}
+			}
+			if (wasButtonHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
+				lightButton(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
+				lastSelectedCoordinate = NO_SELECTION;
+			}
+		}
+	}
 private:
 	sf::Window *App;
 };
