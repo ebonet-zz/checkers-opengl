@@ -69,7 +69,7 @@ int lastHitCount = 0;
 std::queue<piece> pieceList;
 Coordinate lastSelectedCoordinate;
 Coordinate NO_SELECTION(-1, -1);
-bool quit=false;
+bool quit = false;
 //The game core
 CheckersCore GameCore;
 
@@ -243,9 +243,6 @@ void drawBoard(GLenum mode) {
  */
 void drawPiece(piece p) {
 
-	/**
-	 * TODO: Fix the array indexing conflict
-	 */
 	glPushMatrix();
 
 	if (p.pieceType == 'r' || p.pieceType == 'R') {
@@ -261,6 +258,15 @@ void drawPiece(piece p) {
 	gluCylinder(gluNewQuadric(), pieceWidth, pieceWidth, pieceHeight, ROUND_PRECISION, ROUND_PRECISION);
 	glTranslatef(0, 0, pieceHeight);
 	gluDisk(gluNewQuadric(), 0, pieceWidth, ROUND_PRECISION, ROUND_PRECISION);
+
+	if (p.pieceType == 'R' || p.pieceType == 'B') {
+		glTranslatef(0, 0, 0.1);
+		gluDisk(gluNewQuadric(), 0, pieceWidth, ROUND_PRECISION, ROUND_PRECISION);
+		gluCylinder(gluNewQuadric(), pieceWidth, pieceWidth, pieceHeight, ROUND_PRECISION, ROUND_PRECISION);
+		glTranslatef(0, 0, pieceHeight);
+		gluDisk(gluNewQuadric(), 0, pieceWidth, ROUND_PRECISION, ROUND_PRECISION);
+	}
+
 	glPopMatrix();
 }
 
@@ -535,15 +541,13 @@ public:
 				if ((Event.Type == sf::Event::KeyPressed) && (Event.Key.Code == sf::Key::Escape))
 					App->Close();
 
-
-
 				if (Event.Type == sf::Event::MouseButtonPressed) {
 
 					captureClick(Event.MouseButton.X, Event.MouseButton.Y);
 					handleClick();
 				}
 
-				if(quit){
+				if (quit) {
 					App->Close();
 				}
 
@@ -612,8 +616,6 @@ public:
 			if (wasButtonHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
 				performButtonAction(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
 				lastSelectedCoordinate = NO_SELECTION;
-
-
 			}
 		}
 	}

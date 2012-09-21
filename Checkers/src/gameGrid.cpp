@@ -29,6 +29,14 @@ char GameGrid::getCellAt(int row, int column) {
 	return GameGridMatrix[row][column];
 }
 
+void GameGrid::makeKing(int row, int column) {
+	if (GameGridMatrix[row][column] == 'b') {
+		GameGridMatrix[row][column] = 'B';
+	} else if (GameGridMatrix[row][column] == 'r') {
+		GameGridMatrix[row][column] = 'R';
+	}
+}
+
 bool GameGrid::isEmptyCell(Coordinate A) {
 	bool r = getCellAt(A) == EMPTY_CELL;
 	return r;
@@ -38,12 +46,16 @@ bool GameGrid::isPiece(Coordinate A) {
 	return (getCellAt(A) == BEIGE_PAWN || getCellAt(A) == RED_PAWN);
 }
 
+bool GameGrid::isKing(Coordinate A) {
+	return (getCellAt(A) == BEIGE_KING || getCellAt(A) == RED_KING);
+}
+
 void GameGrid::movePiece(Coordinate A, Coordinate B) {
 	if (!isEmptyCell(B)) {
 		cout << "Invalid movement: target is not empty" << endl;
 		return;
 	}
-	if (!isPiece(A)) {
+	if (!isPiece(A) && !isKing(A)) {
 		cout << "Invalid movement: source is not a piece" << endl;
 		return;
 	}
@@ -62,7 +74,8 @@ void GameGrid::removePieceAt(Coordinate A) {
 }
 
 bool GameGrid::isEnemyPiece(int currentPlayer, Coordinate B) {
-	return (!currentPlayer && getCellAt(B) == 'b') || (currentPlayer && getCellAt(B) == 'r');
+	return (!currentPlayer && (getCellAt(B) == 'b' || getCellAt(B) == 'B'))
+			|| (currentPlayer && (getCellAt(B) == 'r' || getCellAt(B) == 'R'));
 }
 
 void GameGrid::createGridFromFile(char * s) {

@@ -8,6 +8,8 @@
 #ifndef CONSTANTS_H_
 #define CONSTANTS_H_
 
+#define BEIGE_KING 'B'
+#define RED_KING 'R'
 #define BEIGE_PAWN 'b'
 #define RED_PAWN 'r'
 #define EMPTY_CELL ' '
