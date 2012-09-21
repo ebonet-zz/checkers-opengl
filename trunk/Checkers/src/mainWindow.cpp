@@ -69,7 +69,7 @@ int lastHitCount = 0;
 std::queue<piece> pieceList;
 Coordinate lastSelectedCoordinate;
 Coordinate NO_SELECTION(-1, -1);
-
+bool quit=false;
 //The game core
 CheckersCore GameCore;
 
@@ -492,12 +492,14 @@ void lightButton(int lin, int col, const GLfloat color[4]) {
 		col = 0;
 
 		if (lin == BUTTON_1_NAME) {
+			GameCore.restartGame();
 			lin = 0;
 		} else {
+			quit = true;
 			lin = 1;
 		}
 
-		memcpy(buttonsColor[lin][col], color, 4 * sizeof(GLfloat));
+		//memcpy(buttonsColor[lin][col], color, 4 * sizeof(GLfloat));
 	}
 }
 
@@ -537,10 +539,16 @@ public:
 				if ((Event.Type == sf::Event::KeyPressed) && (Event.Key.Code == sf::Key::Escape))
 					App->Close();
 
+
+
 				if (Event.Type == sf::Event::MouseButtonPressed) {
 
 					captureClick(Event.MouseButton.X, Event.MouseButton.Y);
 					handleClick();
+				}
+
+				if(quit){
+					App->Close();
 				}
 
 				if ((Event.Type == sf::Event::KeyPressed) && (Event.Key.Code == sf::Key::Right)) {
@@ -608,6 +616,8 @@ public:
 			if (wasButtonHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
 				lightButton(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
 				lastSelectedCoordinate = NO_SELECTION;
+
+
 			}
 		}
 	}
