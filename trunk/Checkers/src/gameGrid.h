@@ -24,6 +24,10 @@ struct GameGrid {
 
 	bool isPiece(Coordinate);
 
+	void makeKing(int, int);
+
+	bool isKing(Coordinate);
+
 	void movePiece(Coordinate, Coordinate);
 
 	void removePieceAt(Coordinate);

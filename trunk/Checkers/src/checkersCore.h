@@ -49,7 +49,7 @@ public:
 
 	int isGameWon(void);
 
-	void restartGame(); //TODO: Implement this
+	void restartGame();
 
 	int getCurrentPlayer();
 
