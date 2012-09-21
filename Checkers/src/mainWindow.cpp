@@ -606,6 +606,19 @@ public:
 					}
 				} else if (wasMoveHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
 					movePiece(lastSelectedCoordinate, newSelected);
+
+					if(GameCore.isGameWon()>0){
+						cout << GameCore.isGameWon() << " won the game" <<endl;
+
+
+						for(int row=0;row<8;row++){
+							for(int col =0; col<8;col++){
+								lightBoardTile(row, col, (GameCore.isGameWon())? RED: BEIGE);
+
+							}
+						}
+					}
+
 					lastSelectedCoordinate = NO_SELECTION;
 				} else {
 					lastSelectedCoordinate = NO_SELECTION;
