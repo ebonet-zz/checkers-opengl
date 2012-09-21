@@ -28,6 +28,7 @@ using namespace std;
 const GLfloat WHITE[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 const GLfloat GREY[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
 const GLfloat LIGHT_GREEN[4] = { 0.0f, 0.4f, 0.0f, 1.0f };
+const GLfloat BLUE[4] = { 0.0f, 0.0f, 0.4f, 1.0f };
 const GLfloat RED[4] = { 0.35f, 0.0f, 0.0f, 1.0f };
 const GLfloat BLACK[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 const GLfloat BEIGE[4] = { 0.3f, 0.3f, 0.1f, 1.0f };
@@ -281,7 +282,7 @@ void drawMenuButtons(GLenum mode) {
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glColor4fv(BLACK);
-	glRasterPos3d(x + 5.5, y - 4, 0.1);
+	glRasterPos3d(x + 5.5, y - 3, 0.1);
 	glBitmap(GLYPH_WIDTH, GLYPH_HEIGHT, 0, 0, GLYPH_WIDTH, 0, (GLubyte*) glyphs['N']);
 	glBitmap(GLYPH_WIDTH, GLYPH_HEIGHT, 0, 0, GLYPH_WIDTH, 0, (GLubyte*) glyphs['e']);
 	glBitmap(GLYPH_WIDTH, GLYPH_HEIGHT, 0, 0, GLYPH_WIDTH, 0, (GLubyte*) glyphs['w']);
@@ -463,6 +464,13 @@ void lightBoardTile(int col, int lin, const GLfloat color[4]) {
 	}
 }
 
+void highLightPossibleMoves(int col, int lin) {
+	std::list<Coordinate> possibleMoves = GameCore.getPossibleMoves(Coordinate(lin, col));
+	for (list<Coordinate>::iterator it = possibleMoves.begin(); it != possibleMoves.end(); it++) {
+		lightBoardTile(it->column, it->row, BLUE);
+	}
+}
+
 void lightButton(int col, int lin, const GLfloat color[4]) {
 	if (wasButtonHit(col, lin)) {
 		lin = 0;
@@ -515,12 +523,15 @@ public:
 					initButtonsColors();
 					handleClick(Event.MouseButton.X, Event.MouseButton.Y);
 					if (lastHitCount != 0) {
-
 						if (wasBoardHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
 							if (GameCore.isTileSelectable(
 									Coordinate(lastSelectedCoordinates[0], lastSelectedCoordinates[1]))) {
 
 								lightBoardTile(lastSelectedCoordinates[0], lastSelectedCoordinates[1], LIGHT_GREEN);
+								highLightPossibleMoves(lastSelectedCoordinates[0], lastSelectedCoordinates[1]);
+							} else {
+								initBoardColors();
+								initButtonsColors();
 							}
 						}
 						if (wasButtonHit(lastSelectedCoordinates[0], lastSelectedCoordinates[1])) {
